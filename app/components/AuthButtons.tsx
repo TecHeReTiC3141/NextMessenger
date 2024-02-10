@@ -2,14 +2,22 @@
 
 import { FaGoogle, FaGithub } from "react-icons/fa";
 import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 
 
 export function GoogleSignInButton() {
     const handleClick = async () => {
-        await signIn("google", {
-            callbackUrl: "/",
+        const signInResponse = await signIn("google", {
+            redirect: false,
         });
+        if (!signInResponse || signInResponse.error) {
+            toast.error("Error while trying to log in, please try again later");
+            console.log("error", signInResponse?.error);
+        } else {
+            toast.success("Successfully logged in via google");
+        }
     };
+
 
     return (
         <button
@@ -24,10 +32,17 @@ export function GoogleSignInButton() {
 
 export function GithubSignInButton() {
     const handleClick = async () => {
-        await signIn("github", {
-            callbackUrl: "/",
+        const signInResponse = await signIn("github", {
+            redirect: false,
         });
+        if (!signInResponse || signInResponse.error) {
+            toast.error("Error while trying to log in, please try again later");
+            console.log("error", signInResponse?.error);
+        } else {
+            toast.success("Successfully logged in via github");
+        }
     };
+
 
 
     return (

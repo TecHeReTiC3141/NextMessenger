@@ -72,7 +72,6 @@ export default function AuthForm() {
 
     }
 
-    console.log(errors);
 
     return (
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -87,8 +86,8 @@ export default function AuthForm() {
                 </form>
                 <div className="divider text-sm">Or continue with</div>
                 <div className="flex gap-3">
-                    <GoogleSignInButton/>
                     <GithubSignInButton/>
+                    <GoogleSignInButton/>
                 </div>
                 <div className="flex gap-2 justify-center mt-4">
 

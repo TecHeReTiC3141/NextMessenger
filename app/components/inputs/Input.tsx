@@ -6,8 +6,6 @@ import {
     FieldValues,
     UseFormRegister,
 } from "react-hook-form";
-import { Simulate } from "react-dom/test-utils";
-import error = Simulate.error;
 
 interface InputProps {
     label: string,
