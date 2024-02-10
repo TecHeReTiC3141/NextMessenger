@@ -30,8 +30,10 @@ export default function AuthForm() {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isLoading },
+        control,
         reset,
+
     } = useForm<FieldValues>({
         defaultValues: {
             name: "",
@@ -49,6 +51,9 @@ export default function AuthForm() {
                 toggleVariant();
             }
         } else if (variant === "LOGIN") {
+            await new Promise((resolve) => {
+                setTimeout(resolve, 3000);
+            })
             // NextAuth SignIn
         }
     }
@@ -68,7 +73,7 @@ export default function AuthForm() {
                     )}
                     <Input label="Email" id="email" type="email" register={register} errors={errors}/>
                     <Input label="Password" id="password" type="password" register={register} errors={errors}/>
-                    <SubmitBtn className="btn-block">{variant === "LOGIN" ? "Log in" : "Register"}</SubmitBtn>
+                    <SubmitBtn className="btn-block" control={control}>{variant === "LOGIN" ? "Log in" : "Register"}</SubmitBtn>
                 </form>
                 <div className="divider text-sm">Or continue with</div>
                 <div className="flex gap-3">
