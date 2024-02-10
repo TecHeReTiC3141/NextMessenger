@@ -44,7 +44,6 @@ model User {
     id              String         @id @default(auto()) @map("_id") @db.ObjectId
     name            String?
     email           String?        @unique
-    slug            String         @unique
     description     String?
     createdAt       DateTime       @default(now())
     updatedAt       DateTime       @updatedAt
@@ -78,6 +77,7 @@ model Conversation {
 model Message {
     id             String        @id @default(auto()) @map("_id") @db.ObjectId
     createdAt      DateTime      @default(now())
+    body           String?
     Conversation   Conversation? @relation(fields: [conversationId], references: [id])
     conversationId String?       @db.ObjectId
     sender         User?         @relation(fields: [senderId], references: [id], onDelete: Cascade)
