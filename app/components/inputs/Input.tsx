@@ -6,12 +6,14 @@ import {
     FieldValues,
     UseFormRegister,
 } from "react-hook-form";
+import { Simulate } from "react-dom/test-utils";
+import error = Simulate.error;
 
 interface InputProps {
     label: string,
     id: string,
     type?: string,
-    required?: boolean,
+    required?: boolean | string,
     register: UseFormRegister<FieldValues>,
     errors: FieldErrors,
     disabled?: boolean,
@@ -28,11 +30,12 @@ export default function Input({ label, id, type, required, register, errors, dis
                 <input type={type} id={id} autoComplete={id} disabled={disabled}
                        className={clsx(`form-input block w-full rounded-md border-0 py-1 
                        text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300
-                        placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6`,
-                           errors[id] && "focus:ring-rose-500",
+                        placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm sm:leading-6`,
+                           errors[id]?.message ? "focus:ring-error" : "focus:ring-sky-600",
                            disabled && "opacity-50 cursor-default",
                            )}
                        {...register(id, { required })}/>
+                {errors[id] !== undefined && <p className="text-error">{errors[id]?.message?.toString()}</p>}
             </div>
         </div>
     )
