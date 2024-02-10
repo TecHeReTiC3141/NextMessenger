@@ -9,6 +9,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormSchema, RegisterFormSchema } from "@/app/lib/schema";
 import { registerUser } from "@/app/(site)/actions";
+import toast from "react-hot-toast";
+import {signIn} from "next-auth/react";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -47,14 +49,22 @@ export default function AuthForm() {
         if (variant === "REGISTER") {
             const isReg = await registerUser(data as FormData);
             if (isReg) {
+                toast.success("You've successfully created your account! Now you can login")
                 reset();
                 toggleVariant();
+            } else {
+                toast.error("Something went wrong");
             }
         } else if (variant === "LOGIN") {
-            await new Promise((resolve) => {
-                setTimeout(resolve, 3000);
-            })
-            // NextAuth SignIn
+            const signInResponse = await signIn("credentials", {
+                ...data,
+                redirect: false,
+            });
+            if (!signInResponse || signInResponse.error) {
+                toast.error("Could not log you in. Please, check you credentials");
+                return;
+            }
+            toast.success("Successfully logged in!");
         }
     }
 
