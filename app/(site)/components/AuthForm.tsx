@@ -1,6 +1,6 @@
 "use client"
 
-import { startTransition, useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Input from "@/app/components/inputs/Input";
 import SubmitBtn from "@/app/components/SubmitBtn";
@@ -10,7 +10,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormSchema, RegisterFormSchema } from "@/app/lib/schema";
 import { registerUser } from "@/app/(site)/actions";
 import toast from "react-hot-toast";
-import {signIn} from "next-auth/react";
+import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -18,9 +20,16 @@ export default function AuthForm() {
 
     const [ variant, setVariant ] = useState<Variant>("LOGIN");
 
-    // function toogleVariant() {
-    //     setVariant(prev => prev === "REGISTER" ? "LOGIN" : "REGISTER");
-    // }
+    const { data: session, status } = useSession();
+
+    const router = useRouter();
+
+    useEffect(() => {
+
+        if (status === "authenticated") {
+            router.push("/users");
+        }
+    }, [status, router]);
     const toggleVariant = useCallback(() => {
         if (variant === "LOGIN") {
             setVariant("REGISTER");
@@ -50,8 +59,7 @@ export default function AuthForm() {
             const isReg = await registerUser(data as FormData);
             if (isReg) {
                 toast.success("You've successfully created your account! Now you can login")
-                reset();
-                toggleVariant();
+                await signIn("credentials", {...data, redirect: false});
             } else {
                 toast.error("Something went wrong");
             }
@@ -68,11 +76,6 @@ export default function AuthForm() {
         }
     }
 
-    function socialAction(action: string) {
-
-    }
-
-
     return (
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
             <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
@@ -82,7 +85,8 @@ export default function AuthForm() {
                     )}
                     <Input label="Email" id="email" type="email" register={register} errors={errors}/>
                     <Input label="Password" id="password" type="password" register={register} errors={errors}/>
-                    <SubmitBtn className="btn-block" control={control}>{variant === "LOGIN" ? "Log in" : "Register"}</SubmitBtn>
+                    <SubmitBtn className="btn-block"
+                               control={control}>{variant === "LOGIN" ? "Log in" : "Register"}</SubmitBtn>
                 </form>
                 <div className="divider text-sm">Or continue with</div>
                 <div className="flex gap-3">
