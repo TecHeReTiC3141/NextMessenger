@@ -3,6 +3,8 @@
 import { User } from "@prisma/client";
 import prisma from "@/app/lib/db/prisma";
 import bcrypt from "bcrypt";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/config/authOptions";
 
 export interface UserCredentials {
     name: string,
@@ -27,6 +29,23 @@ export async function createUser({name, email, password}: UserCredentials): Prom
             email,
             name,
             password: hashedPassword,
+        }
+    });
+}
+
+export async function getOtherUsers() {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) return [];
+
+    return await prisma.user.findMany({
+        orderBy: {
+            createdAt: "desc",
+        },
+        where: {
+            NOT: {
+                email: session.user.email,
+            }
         }
     });
 }

@@ -15,7 +15,7 @@ export default function DesktopSidebar({user}: DesktopSidebarProps) {
     const [ isOpened, setIsOpened ] = useState(false);
 
     return (
-        <div className="hidden lg:fixed left-0 inset-y-0 z-40 w-20 lg:w-24 border-r-[1px] bg-base-100 xl:px-6
+        <div className="hidden lg:fixed left-0 inset-y-0 z-40 w-20 border-r-[1px] bg-base-100 xl:px-3
                 overflow-y-auto overflow-x-hidden pb-6 lg:flex flex-col items-center justify-between">
             <nav className="mt-4 flex flex-col justify-between">
                 <ul role="list" className="flex flex-col space-y-1 items-center">
