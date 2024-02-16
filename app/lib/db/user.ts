@@ -10,6 +10,15 @@ export interface UserCredentials {
     password: string,
 }
 
+export type SessionUser =
+    {
+        id: string,
+    } & {
+    name?: string | null | undefined,
+    email?: string | null | undefined,
+    image?: string | null | undefined
+} | undefined;
+
 export async function createUser({name, email, password}: UserCredentials): Promise<User | null> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
