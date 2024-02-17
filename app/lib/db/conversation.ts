@@ -3,14 +3,20 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
+import { Prisma } from "@prisma/client";
+
+
+export type ConversationWithUsers = Prisma.ConversationGetPayload<{
+    include: { users: true },
+}>;
 
 export interface ChatCreateData {
     userId: string,
 }
 
-export async function createChat({ userId }: ChatCreateData) {
+export async function createChat({ userId }: ChatCreateData): Promise<ConversationWithUsers | null> {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) return;
+    if (!session || !session.user) return null;
 
     const currentUser = session.user;
 
@@ -18,8 +24,11 @@ export async function createChat({ userId }: ChatCreateData) {
         where: {
             isGroup: false,
             userIds: {
-                hasEvery: [currentUser.id, userId],
-            }
+                hasEvery: [ currentUser.id, userId ],
+            },
+        },
+        include: {
+            users: true,
         }
     });
     if (existingConversations.length > 0) {
@@ -47,9 +56,9 @@ export interface GroupChatCreateData {
     name: string,
 }
 
-export async function createGroupChat({ name, members }: GroupChatCreateData) {
+export async function createGroupChat({ name, members }: GroupChatCreateData): Promise<ConversationWithUsers | null> {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) return;
+    if (!session || !session.user) return null;
 
     const currentUser = session.user;
 
@@ -71,3 +80,42 @@ export async function createGroupChat({ name, members }: GroupChatCreateData) {
         }
     });
 }
+
+export type ConversationWithMessages = Prisma.ConversationGetPayload<{
+    include: {
+        messages: {
+            include: {
+                sender: true,
+                seen: true,
+            }
+        }
+    }
+}>;
+
+export type ConversationInList = ConversationWithMessages & ConversationWithUsers;
+
+export async function getUserConversations(): Promise<ConversationInList[]> {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        return [];
+    }
+    return prisma.conversation.findMany({
+        where: {
+            userIds: {
+                has: session.user.id,
+            },
+        },
+        orderBy: { lastMessageAt: 'desc' },
+        include: {
+            users: true,
+            messages: {
+                include: {
+                    sender: true,
+                    seen: true,
+                }
+            }
+        }
+    });
+}
+
