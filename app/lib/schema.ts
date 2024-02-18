@@ -8,3 +8,9 @@ export const LoginFormSchema = z.object({
 export const RegisterFormSchema = LoginFormSchema.extend({
     name: z.string().min(1, "Name must not be empty"),
 });
+
+export const AddMessageFormSchema = z.object({
+    message: z.string().min(1, "Message must not be empty"),
+    image: z.string().optional(),
+    conversationId: z.string().min(1, "Internal error with conversationId"),
+})

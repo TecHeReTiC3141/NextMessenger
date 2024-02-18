@@ -18,7 +18,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
     const statusText = conversation.isGroup ? `${conversation.users.length} members` : "was recently";
 
     return (
-        <div className="flex w-full py-2 px-4 lg:px-6 border-b border-neutral shadow-sm  items-center gap-3">
+        <div className="flex w-full py-2 px-4 lg:px-6 border-b border-neutral shadow-md  items-center gap-3">
             <Link href="/conversations" className="lg:hidden text-sky-500 hover:text-sky-700 transition">
                 <FaArrowLeft size={32}/>
             </Link>

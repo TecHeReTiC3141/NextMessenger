@@ -11,7 +11,7 @@ interface UserAvatarProps {
 
 export default function UserAvatar({user, width, height}: UserAvatarProps) {
     return (
-        <div className="avatar online cursor-pointer hover:opacity-75 transition-opacity duration-200">
+        <div className="avatar relative online cursor-pointer hover:opacity-75 transition-opacity duration-200">
             <div style={{width, height}} className="rounded-full">
 
             <Image className="rounded-full object-cover"

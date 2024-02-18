@@ -5,7 +5,6 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Input from "@/app/components/inputs/Input";
 import SubmitBtn from "@/app/components/SubmitBtn";
 import { GoogleSignInButton, GithubSignInButton } from "@/app/components/AuthButtons";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormSchema, RegisterFormSchema } from "@/app/lib/schema";
 import { registerUser } from "@/app/(site)/actions";
