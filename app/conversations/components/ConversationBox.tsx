@@ -35,7 +35,7 @@ export default function ConversationBox({ conversation, selected }: Conversation
         return seen.filter(user => user.email === userEmail).length > 0;
     }, [ lastMessage, userEmail ]);
 
-    const lastMessageText = lastMessage ? (lastMessage?.image ? lastMessage?.body : "Sent an image") : "Start a new chat";
+    const lastMessageText = lastMessage ? (lastMessage?.image ? "Sent an image" : lastMessage?.body ) : "Start a new chat";
 
     return (
         <>

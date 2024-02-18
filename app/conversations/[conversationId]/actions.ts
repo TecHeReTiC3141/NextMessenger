@@ -25,11 +25,11 @@ export default async function getConversationById(conversationId: string): Promi
     });
 }
 
-export async function handleNewMessage(formData: FormData): Promise<boolean | FullMessage> {
+export async function handleNewMessage(formData: FormData): Promise<boolean> {
     const res = AddMessageFormSchema.safeParse(formData);
     if (res.success) {
         const {data: {message, image, conversationId}} = res;
-        return await createNewMessage({body: message, image, conversationId});
+        await createNewMessage({body: message, image, conversationId});
     }
     return res.success;
 }

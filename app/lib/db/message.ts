@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
 import { Message, User } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 interface CreateMessageData {
     body: string,
@@ -58,5 +59,7 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
             }
         }
     });
+    revalidatePath("/conversations");
     return newMessage;
+
 }
