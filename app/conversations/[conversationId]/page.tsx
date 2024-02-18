@@ -19,10 +19,10 @@ export default async function ConversationPage({ params: { conversationId } }: C
     }
 
     return (
-        <div className="lg:pl-80 h-full">
+        <div className="lg:pl-80 h-full max-h-full">
             <div className="h-full flex flex-col">
                 <ConversationHeader conversation={conversation} />
-                <ConversationBody />
+                <ConversationBody initialMessages={conversation.messages} />
                 <AddNewMessageForm  />
             </div>
         </div>
