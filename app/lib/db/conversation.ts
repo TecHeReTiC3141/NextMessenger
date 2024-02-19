@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
 import { Prisma } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 
 export type ConversationWithUsers = Prisma.ConversationGetPayload<{
@@ -117,5 +118,42 @@ export async function getUserConversations(): Promise<ConversationInList[]> {
             }
         }
     });
+}
+
+export async function deleteConversationById(conversationId: string) {
+
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const currentUser = session.user;
+
+    const existingConversation  = await prisma.conversation.findUnique({
+        where: {
+            id: conversationId,
+        },
+        include: {
+            users: true,
+        }
+    });
+
+    if (existingConversation === null) {
+        throw new Error("Invalid ID");
+    }
+
+    const conversation = await prisma.conversation.delete({
+        where: {
+            id: conversationId,
+            userIds: {
+                hasSome: [currentUser.id],
+            }
+        }
+    });
+    if (conversation === null) {
+        throw new Error("Conversation not found");
+    }
+    return redirect("/conversations");
 }
 

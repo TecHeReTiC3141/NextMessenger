@@ -9,6 +9,7 @@ import { FaEllipsisVertical } from "react-icons/fa6";
 import { useState } from "react";
 import ProfileDrawer from "@/app/conversations/[conversationId]/components/ProfileDrawer";
 import Modal from "@/app/components/Modal";
+import ConfirmDeleteModal from "@/app/conversations/[conversationId]/components/ConfirmDeleteModal";
 
 
 interface ConversationHeaderProps {
@@ -50,17 +51,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                     <ProfileDrawer conversation={conversation}/>
                 </div>
             </div>
-            <Modal id="delete-conversation">
-                <div>
-                    <h2>Are you sure to delete conversation? This action can not be undone</h2>
-                    <div className="modal-action  mt-4">
-                        <form method="dialog">
-                            <button className="btn btn-sm rounded-lg btn-ghost mr-2">Cancel</button>
-                            <button className="btn btn-sm rounded-lg btn-error">Delete</button>
-                        </form>
-                    </div>
-                </div>
-            </Modal>
+            <ConfirmDeleteModal/>
         </>
 
     )

@@ -61,5 +61,5 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
     });
     revalidatePath("/conversations");
     return newMessage;
-
 }
+
