@@ -19,6 +19,11 @@ export default function ProfileDrawer({ conversation }: ProfileModalProps) {
 
     const statusText = conversation.isGroup ? `${conversation.users.length} members` : "Active";
 
+    function openDeleteModal() {
+        const modal = document.querySelector("#delete-conversation") as HTMLDialogElement;
+        modal.showModal();
+    }
+
     return (
         <div className="relative min-w-96 h-full bg-white px-8">
             <div className="absolute inset-x-0 top-0 bg-neutral h-12">
@@ -34,7 +39,7 @@ export default function ProfileDrawer({ conversation }: ProfileModalProps) {
                 <p className="text-sm">{statusText}</p>
 
                 <div className="group flex flex-col items-center">
-                    <button className="btn btn-circle btn-error btn-ghost btn-sm hover:bg-error">
+                    <button className="btn btn-circle btn-error btn-ghost btn-sm hover:bg-error" onClick={openDeleteModal}>
                         <FaRegTrashCan/>
                     </button>
                     <p className="group-hover:font-bold p-1 rounded-lg text-sm">Delete?</p>
