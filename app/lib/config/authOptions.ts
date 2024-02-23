@@ -62,6 +62,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.accessToken = user.access_token;
                 token.id = user.id;
+                token.description = user.description;
             }
             return token;
         },
@@ -72,10 +73,16 @@ export const authOptions: NextAuthOptions = {
             const user = await prisma.user.findUnique({
                 where: { id: token.id as string },
                 select: {
+                    name: true,
                     image: true,
+                    description: true,
                 }
             })!;
+
+            session.user.name = (user as User).name;
             session.user.image = (user as User).image;
+            session.user.description = (user as User).description;
+
             return session;
         },
     },

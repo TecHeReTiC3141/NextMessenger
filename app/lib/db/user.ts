@@ -5,6 +5,8 @@ import prisma from "@/app/lib/db/prisma";
 import bcrypt from "bcrypt";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
+import { z } from "zod";
+import { UserSettingsFormSchema } from "@/app/lib/schema";
 
 export interface UserCredentials {
     name: string,
@@ -15,6 +17,7 @@ export interface UserCredentials {
 export type SessionUser =
     {
         id: string,
+        description: string | null,
     } & {
     name?: string | null | undefined,
     email?: string | null | undefined,
@@ -50,3 +53,20 @@ export async function getOtherUsers() {
     });
 }
 
+export async function updateUserSettings(formData: FormData): Promise<User | null> {
+    const res = UserSettingsFormSchema.safeParse(formData);
+    if (res.success) {
+        const {data} = res;
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user) {
+            throw new Error("Unauthorized");
+        }
+        return await prisma.user.update({
+            where: {
+                id: session.user.id,
+            },
+            data,
+        });
+    }
+    return null;
+}

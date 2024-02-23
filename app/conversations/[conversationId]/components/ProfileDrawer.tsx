@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { IoClose } from "react-icons/io5";
 import UserAvatar from "@/app/components/UserAvatar";
 import { FaRegTrashCan } from "react-icons/fa6";
+import { openModal } from "@/app/components/Modal";
 
 interface ProfileModalProps {
     conversation: ConversationInList
@@ -18,11 +19,6 @@ export default function ProfileDrawer({ conversation }: ProfileModalProps) {
     const title = conversation.name || otherUser.name;
 
     const statusText = conversation.isGroup ? `${conversation.users.length} members` : "Active";
-
-    function openDeleteModal() {
-        const modal = document.querySelector("#delete-conversation") as HTMLDialogElement;
-        modal.showModal();
-    }
 
     return (
         <div className="relative min-w-96 h-full bg-white px-8">
@@ -39,7 +35,7 @@ export default function ProfileDrawer({ conversation }: ProfileModalProps) {
                 <p className="text-sm">{statusText}</p>
 
                 <div className="group flex flex-col items-center">
-                    <button className="btn btn-circle btn-error btn-ghost btn-sm hover:bg-error" onClick={openDeleteModal}>
+                    <button className="btn btn-circle btn-error btn-ghost btn-sm hover:bg-error" onClick={() => openModal("delete-conversation")}>
                         <FaRegTrashCan/>
                     </button>
                     <p className="group-hover:font-bold p-1 rounded-lg text-sm">Delete?</p>

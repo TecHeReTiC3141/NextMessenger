@@ -20,3 +20,19 @@ export default function Modal({id, children}: ModalProps) {
         </dialog>
     )
 }
+
+export function openModal(id: string) {
+    const modal = document.getElementById(id);
+    if (!modal) {
+        return;
+    }
+    (modal as HTMLDialogElement).showModal();
+}
+
+export function closeModal(id: string) {
+    const modal = document.getElementById(id);
+    if (!modal) {
+        return;
+    }
+    (modal as HTMLDialogElement).close();
+}

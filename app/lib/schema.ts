@@ -13,4 +13,11 @@ export const AddMessageFormSchema = z.object({
     message: z.string().min(1, "Message must not be empty"),
     image: z.string().optional(),
     conversationId: z.string().min(1, "Internal error with conversationId"),
-})
+});
+
+export const UserSettingsFormSchema = z.object({
+    name: z.string().min(1, "Name must not be empty"),
+    image: z.string().optional(),
+    description: z.string().optional(),
+});
+

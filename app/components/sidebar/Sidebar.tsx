@@ -7,6 +7,7 @@ export default async function Sidebar({children}: {children: React.ReactNode}) {
 
     const session = await getServerSession(authOptions) as Session;
 
+    console.log(session.user);
 
     return (
         <div className="h-full">
