@@ -54,6 +54,7 @@ export async function getOtherUsers() {
 }
 
 export async function updateUserSettings(formData: FormData): Promise<User | null> {
+    await new Promise(resolve => setTimeout(resolve, 3000));
     const res = UserSettingsFormSchema.safeParse(formData);
     if (res.success) {
         const {data} = res;

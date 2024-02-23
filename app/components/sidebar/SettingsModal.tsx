@@ -2,12 +2,13 @@ import { SessionUser, updateUserSettings } from "@/app/lib/db/user";
 import Modal, { closeModal, openModal } from "@/app/components/Modal";
 import { z } from "zod";
 import { UserSettingsFormSchema } from "@/app/lib/schema";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { Control, FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import avatarPlaceholder from "@/public/images/avatar-placeholder.jpg"
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { CldUploadButton } from "next-cloudinary";
 import toast from "react-hot-toast";
+import SubmitBtn from "@/app/components/SubmitBtn";
 
 interface SettingsModalProps {
     user: NonNullable<SessionUser>,
@@ -24,6 +25,7 @@ export default function SettingsModal({ user }: SettingsModalProps) {
         setValue,
         reset,
         watch,
+        control,
     } = useForm<FormInputs>({
         defaultValues: {
             name: user.name as string,
@@ -98,7 +100,7 @@ export default function SettingsModal({ user }: SettingsModalProps) {
                             <form method="dialog">
                                 <button className="btn btn-sm rounded-lg btn-ghost mr-2">Cancel</button>
                             </form>
-                            <button className="btn btn-sm rounded-lg btn-primary" disabled={isLoading}>Update</button>
+                            <SubmitBtn className="btn-sm" control={control} >Save</SubmitBtn>
                         </div>
                     </div>
                 </form>

@@ -8,7 +8,7 @@ import { Control, useFormState } from "react-hook-form";
 type SubmitBtnProps = {
     children: React.ReactNode,
     className?: string,
-    control: Control,
+    control: Control<any>,
 } & ComponentProps<"button">
 
 export default function SubmitBtn({children, className, control}: SubmitBtnProps) {
