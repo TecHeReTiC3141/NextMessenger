@@ -24,8 +24,8 @@ export const UserSettingsFormSchema = z.object({
 });
 
 const memberSchema = z.object({
-    name: z.string().min(1),
-    id: z.string().min(1),
+    value: z.string().min(1),
+    label: z.string().min(1),
 })
 
 export const CreateGroupChatSchema = z.object({

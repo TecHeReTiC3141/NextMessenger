@@ -97,7 +97,10 @@ export default function SettingsModal({ user }: SettingsModalProps) {
                     </label>
                     <div className="flex w-full justify-end">
                         <div className="modal-action  mt-4">
-                            <button className="btn btn-sm rounded-lg btn-ghost mr-2" onClick={() => closeModal("settings-modal")}>Cancel</button>
+                            <button className="btn btn-sm rounded-lg btn-ghost mr-2" onClick={ev => {
+                                ev.preventDefault();
+                                closeModal("settings-modal");
+                            }}>Cancel</button>
                             <SubmitBtn className="btn-sm" control={control} >Save</SubmitBtn>
                         </div>
                     </div>
