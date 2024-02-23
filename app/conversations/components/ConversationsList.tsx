@@ -9,6 +9,7 @@ import ConversationBox from "@/app/conversations/components/ConversationBox";
 import clsx from "clsx";
 import { User } from "@prisma/client";
 import GroupChatModal from "@/app/conversations/components/GroupChatModal";
+import { openModal } from "@/app/components/Modal";
 
 
 interface ConversationsListProps {
@@ -33,9 +34,9 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
                         <div className="text-2xl font-bold">
                             Chats
                         </div>
-                        <div className="rounded-full p-2 bg-gray-100 hover:bg-gray-300 cursor-pointer">
+                        <button onClick={() => openModal("add-group-chat")} className="rounded-full p-2 bg-gray-100 hover:bg-gray-300 cursor-pointer">
                             <MdGroupAdd size={20}/>
-                        </div>
+                        </button>
                     </div>
                     {items.map(conversation => (
                         <ConversationBox key={conversation.id} conversation={conversation}

@@ -82,9 +82,9 @@ export default function SettingsModal({ user }: SettingsModalProps) {
                             options={{ maxFiles: 1 }}
                             onUpload={onUpload}
                             uploadPreset="uupnbab6">
-                            <button className="btn btn-primary" onClick={() => closeModal("settings-modal")}>
+                            <div className="btn btn-primary" onClick={() => closeModal("settings-modal")}>
                                 Change
-                            </button>
+                            </div>
                         </CldUploadButton>
                     </div>
                     <input type="hidden" {...register("image")}/>
@@ -97,9 +97,7 @@ export default function SettingsModal({ user }: SettingsModalProps) {
                     </label>
                     <div className="flex w-full justify-end">
                         <div className="modal-action  mt-4">
-                            <form method="dialog">
-                                <button className="btn btn-sm rounded-lg btn-ghost mr-2">Cancel</button>
-                            </form>
+                            <button className="btn btn-sm rounded-lg btn-ghost mr-2" onClick={() => closeModal("settings-modal")}>Cancel</button>
                             <SubmitBtn className="btn-sm" control={control} >Save</SubmitBtn>
                         </div>
                     </div>
