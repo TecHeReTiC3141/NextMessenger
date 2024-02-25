@@ -12,9 +12,10 @@ interface CreateMessageData {
     image?: string,
 }
 
-type MessageWithSeen = Message & {seen: User[]};
-type MessageWithSender = Message & {sender: User | null};
+type MessageWithSeen = Message & { seen: User[] };
+type MessageWithSender = Message & { sender: User | null };
 export type FullMessage = MessageWithSender & MessageWithSeen;
+import { pusherServer } from "@/app/lib/pusher";
 
 export async function createNewMessage({ body, image, conversationId }: CreateMessageData): Promise<FullMessage> {
     const session = await getServerSession(authOptions);
@@ -59,7 +60,15 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
             }
         }
     });
-    revalidatePath("/conversations");
+
+    await pusherServer.trigger(conversationId, "message:new", newMessage);
+
+    const lastMessage = updatedConversation.messages.at(-1);
+
+    updatedConversation.users.map(async user => {
+        await pusherServer.trigger(user.email as string, "conversation:update", { id: conversationId, messages: [lastMessage]});
+    })
+
     return newMessage;
 }
 

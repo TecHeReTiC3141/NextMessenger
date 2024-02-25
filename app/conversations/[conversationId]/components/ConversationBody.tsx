@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from "react";
 import useConversation from "@/app/hooks/useConversation";
 import MessageBox from "@/app/conversations/[conversationId]/components/MessageBox";
 import { setSeenLastMessage } from "@/app/conversations/[conversationId]/actions";
+import { pusherClient } from "@/app/lib/pusher";
+import {find} from "lodash";
 
 interface ConversationBodyProps {
     initialMessages: FullMessage[],
@@ -19,6 +21,29 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
 
     useEffect( () => {
         setSeenLastMessage(conversationId).then(() => console.log("seen updated"));
+    }, [conversationId]);
+
+    useEffect(() => {
+        pusherClient.subscribe(conversationId);
+        bottomRef?.current?.scrollIntoView();
+
+        function messageHandler(newMessage: FullMessage) {
+            setMessages(prev => {
+                if (find(prev, {id: newMessage.id})) {
+                    return prev;
+                }
+                return [...prev, newMessage];
+            });
+            bottomRef?.current?.scrollIntoView();
+            setSeenLastMessage(conversationId).then(() => console.log("seen updated"));
+        }
+
+        pusherClient.bind("message:new", messageHandler);
+
+        return () => {
+            pusherClient.unsubscribe(conversationId);
+            pusherClient.unbind("message:new", messageHandler);
+        };
     }, [conversationId]);
 
     return (
