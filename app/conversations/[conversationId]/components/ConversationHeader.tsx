@@ -10,6 +10,7 @@ import { useState } from "react";
 import ProfileDrawer from "@/app/conversations/[conversationId]/components/ProfileDrawer";
 import Modal from "@/app/components/Modal";
 import ConfirmDeleteModal from "@/app/conversations/[conversationId]/components/ConfirmDeleteModal";
+import AvatarGroup from "@/app/components/AvatarGroup";
 
 
 interface ConversationHeaderProps {
@@ -33,7 +34,10 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                         <Link href="/conversations" className="lg:hidden text-sky-500 hover:text-sky-700 transition">
                             <FaArrowLeft size={32}/>
                         </Link>
-                        <UserAvatar user={otherUser} width={36} height={36}/>
+                        {conversation.isGroup ?
+                            <AvatarGroup users={conversation.users} /> :
+                            <UserAvatar user={otherUser} width={36} height={36}/>
+                        }
                         <div className="flex-1">
                             <h2 className="text-xl font-bold">{conversation.name || otherUser.name}</h2>
                             <p className="text-sm">{statusText}</p>

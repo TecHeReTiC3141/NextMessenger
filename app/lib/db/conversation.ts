@@ -5,6 +5,7 @@ import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
 import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
+import { CreateGroupChatSchema } from "@/app/lib/schema";
 
 
 export type ConversationWithUsers = Prisma.ConversationGetPayload<{
@@ -33,7 +34,7 @@ export async function createChat({ userId }: ChatCreateData): Promise<Conversati
         }
     });
     if (existingConversations.length > 0) {
-        return existingConversations[0];
+        return existingConversations[ 0 ];
     }
 
     return prisma.conversation.create({
@@ -52,12 +53,12 @@ export async function createChat({ userId }: ChatCreateData): Promise<Conversati
     });
 }
 
-export interface GroupChatCreateData {
-    members: { id: string }[],
-    name: string,
-}
-
-export async function createGroupChat({ name, members }: GroupChatCreateData): Promise<ConversationWithUsers | null> {
+export async function createGroupChat(data: FormData): Promise<ConversationWithUsers | null> {
+    const res = CreateGroupChatSchema.safeParse(data);
+    if (!res.success) {
+        return null;
+    }
+    const {data: {name, members}} = res;
     const session = await getServerSession(authOptions);
     if (!session || !session.user) return null;
 
@@ -71,7 +72,7 @@ export async function createGroupChat({ name, members }: GroupChatCreateData): P
                 connect: [
                     { id: currentUser.id },
                     ...(members.map(member => (
-                        { id: member.id }
+                        { id: member.value }
                     ))),
                 ]
             }

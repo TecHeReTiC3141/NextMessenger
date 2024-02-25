@@ -30,5 +30,5 @@ const memberSchema = z.object({
 
 export const CreateGroupChatSchema = z.object({
     name: nameInput,
-    members: z.array(memberSchema),
+    members: z.array(memberSchema).min(2, "At least two users must present"),
 })
