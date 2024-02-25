@@ -6,6 +6,8 @@ import UserAvatar from "@/app/components/UserAvatar";
 import { User } from "@prisma/client";
 import { format } from "date-fns";
 import Image from "next/image";
+import ImageModal from "@/app/conversations/[conversationId]/components/ImageModal";
+import { openModal } from "@/app/components/Modal";
 
 interface MessageBoxProps {
     message: FullMessage,
@@ -37,10 +39,13 @@ export default function MessageBox({ message, isLast }: MessageBoxProps) {
             </div>
             {
                 message.image ?
-                    <div className="overflow-hidden">
-                        <Image src={message.image} alt="Message image" width={288} height={288}
-                               className="object-cover rounded-md cursor-pointer hover:scale-110 transition"/>
-                    </div> :
+                    <>
+                        <ImageModal src={message.image}/>
+                        <button className="overflow-hidden" onClick={() => openModal(`image-modal-${message.image}`)}>
+                            <Image src={message.image} alt="Message image" width={288} height={288}
+                                   className="object-cover rounded-md cursor-pointer hover:scale-110 transition"/>
+                        </button>
+                    </> :
                     <div
                         className={clsx("chat-bubble", isOwnMessage ? "bg-primary" : "bg-base-300 text-base-content")}>
                         {message.body}
