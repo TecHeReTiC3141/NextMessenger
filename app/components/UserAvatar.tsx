@@ -1,17 +1,22 @@
 import {SessionUser} from "@/app/lib/db/user";
 import Image from "next/image";
-import {FaUser} from "react-icons/fa6";
 import avatarPlaceholder from "@/public/images/avatar-placeholder.jpg";
+import useActiveList from "@/app/hooks/useActiveList";
+import clsx from "clsx";
 
 interface UserAvatarProps {
-    user: SessionUser,
+    user: NonNullable<SessionUser>,
     width: number,
     height: number,
 }
 
 export default function UserAvatar({user, width, height}: UserAvatarProps) {
+
+    const { members } = useActiveList();
+
+    const isActive = members.indexOf(user.email as string) !== -1;
     return (
-        <div className="avatar relative online cursor-pointer hover:opacity-75 transition-opacity duration-200">
+        <div className={clsx("avatar relative cursor-pointer hover:opacity-75 transition-opacity duration-200", isActive ? "online" : "offline")}>
             <div style={{width, height}} className="rounded-full">
 
             <Image className="rounded-full object-cover"

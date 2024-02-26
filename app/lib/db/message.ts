@@ -69,7 +69,7 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
         await pusherServer.trigger(user.email as string, "conversation:update",
             { id: conversationId, lastMessageAt: updatedConversation.lastMessageAt, messages: [ lastMessage ] });
     })
-
+    revalidatePath("/conversations/[conversationId]", "page");
     return newMessage;
 }
 

@@ -6,6 +6,7 @@ import UserAvatar from "@/app/components/UserAvatar";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { openModal } from "@/app/components/Modal";
 import AvatarGroup from "@/app/components/AvatarGroup";
+import useActiveList from "@/app/hooks/useActiveList";
 
 interface ProfileModalProps {
     conversation: ConversationInList
@@ -19,7 +20,10 @@ export default function ProfileDrawer({ conversation }: ProfileModalProps) {
 
     const title = conversation.name || otherUser.name;
 
-    const statusText = conversation.isGroup ? `${conversation.users.length} members` : "Active";
+    const { members } = useActiveList();
+
+    const statusText = conversation.isGroup ? `${conversation.users.length} members` :
+        (members.indexOf(otherUser.email as string) !== -1 ? "Active" : "was recently");
 
     return (
         <div className="relative min-w-96 max-w-lg h-full bg-white px-8">

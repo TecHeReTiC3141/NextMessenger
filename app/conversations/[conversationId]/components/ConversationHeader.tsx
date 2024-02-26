@@ -6,11 +6,10 @@ import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa6";
 import UserAvatar from "@/app/components/UserAvatar";
 import { FaEllipsisVertical } from "react-icons/fa6";
-import { useState } from "react";
 import ProfileDrawer from "@/app/conversations/[conversationId]/components/ProfileDrawer";
-import Modal from "@/app/components/Modal";
 import ConfirmDeleteModal from "@/app/conversations/[conversationId]/components/ConfirmDeleteModal";
 import AvatarGroup from "@/app/components/AvatarGroup";
+import useActiveList from "@/app/hooks/useActiveList";
 
 
 interface ConversationHeaderProps {
@@ -19,8 +18,11 @@ interface ConversationHeaderProps {
 
 export default function ConversationHeader({ conversation }: ConversationHeaderProps) {
 
+    const { members } = useActiveList();
+
     const otherUser = useOtherUser(conversation);
-    const statusText = conversation.isGroup ? `${conversation.users.length} members` : "was recently";
+    const statusText = conversation.isGroup ? `${conversation.users.length} members` :
+        (members.indexOf(otherUser.email as string) !== -1 ? "Active" : "was recently");
 
 
     return (
@@ -35,7 +37,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                             <FaArrowLeft size={32}/>
                         </Link>
                         {conversation.isGroup ?
-                            <AvatarGroup users={conversation.users} /> :
+                            <AvatarGroup users={conversation.users}/> :
                             <UserAvatar user={otherUser} width={36} height={36}/>
                         }
                         <div className="flex-1">
