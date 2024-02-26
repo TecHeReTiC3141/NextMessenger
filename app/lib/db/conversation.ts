@@ -161,7 +161,7 @@ export async function deleteConversationById(conversationId: string) {
         throw new Error("Invalid ID");
     }
 
-    const conversation = await prisma.conversation.delete({
+    const deletedConversation = await prisma.conversation.delete({
         where: {
             id: conversationId,
             userIds: {
@@ -169,9 +169,16 @@ export async function deleteConversationById(conversationId: string) {
             }
         }
     });
-    if (conversation === null) {
+    if (deletedConversation === null) {
         throw new Error("Conversation not found");
     }
+
+    existingConversation.users.forEach(user => {
+        if (user.email) {
+            pusherServer.trigger(user.email, "conversation:remove", existingConversation);
+        }
+    })
+
     return redirect("/conversations");
 }
 

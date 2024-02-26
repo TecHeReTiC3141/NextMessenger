@@ -66,8 +66,8 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
     const lastMessage = updatedConversation.messages.at(-1);
 
     updatedConversation.users.map(async user => {
-        console.log("updated conversation", user.email, { id: conversationId, messages: [lastMessage]});
-        await pusherServer.trigger(user.email as string, "conversation:update", { id: conversationId, messages: [lastMessage]});
+        await pusherServer.trigger(user.email as string, "conversation:update",
+            { id: conversationId, lastMessageAt: updatedConversation.lastMessageAt, messages: [ lastMessage ] });
     })
 
     return newMessage;

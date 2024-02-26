@@ -92,6 +92,7 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
     await pusherServer.trigger(currentUser.email as string, "conversation:update", {
         id: conversationId,
         messages: [updatedMessage],
+        lastMessageAt: curConversation.lastMessageAt,
     });
 
     console.log("updated message", updatedMessage);
