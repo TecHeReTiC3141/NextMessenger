@@ -23,8 +23,6 @@ export default function ConversationBox({ conversation, selected }: Conversation
 
     const lastMessage = (conversation.messages || []).at(-1);
 
-    console.log(conversation.name, conversation.messages);
-
     const seenLastMessage = useMemo(() => {
         if (!userEmail || !lastMessage) {
             return false;
