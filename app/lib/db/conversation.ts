@@ -6,6 +6,7 @@ import prisma from "@/app/lib/db/prisma";
 import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { CreateGroupChatSchema } from "@/app/lib/schema";
+import { pusherClient, pusherServer } from "@/app/lib/pusher";
 
 
 export type ConversationWithUsers = Prisma.ConversationGetPayload<{
@@ -37,7 +38,7 @@ export async function createChat({ userId }: ChatCreateData): Promise<Conversati
         return existingConversations[ 0 ];
     }
 
-    return prisma.conversation.create({
+    const newConversation = await prisma.conversation.create({
         data: {
             isGroup: false,
             users: {
@@ -51,6 +52,14 @@ export async function createChat({ userId }: ChatCreateData): Promise<Conversati
             users: true,
         }
     });
+
+    newConversation.users.forEach(user => {
+        if (user.email) {
+            pusherServer.trigger(user.email, "conversation:new", newConversation);
+        }
+    })
+
+    return newConversation;
 }
 
 export async function createGroupChat(data: FormData): Promise<ConversationWithUsers | null> {
@@ -58,13 +67,13 @@ export async function createGroupChat(data: FormData): Promise<ConversationWithU
     if (!res.success) {
         return null;
     }
-    const {data: {name, members}} = res;
+    const { data: { name, members } } = res;
     const session = await getServerSession(authOptions);
     if (!session || !session.user) return null;
 
     const currentUser = session.user;
 
-    return prisma.conversation.create({
+    const newConversation = await prisma.conversation.create({
         data: {
             name,
             isGroup: true,
@@ -81,6 +90,14 @@ export async function createGroupChat(data: FormData): Promise<ConversationWithU
             users: true,
         }
     });
+
+    newConversation.users.forEach(user => {
+        if (user.email) {
+            pusherServer.trigger(user.email, "conversation:new", newConversation);
+        }
+    });
+
+    return newConversation;
 }
 
 export type ConversationWithMessages = Prisma.ConversationGetPayload<{
@@ -131,7 +148,7 @@ export async function deleteConversationById(conversationId: string) {
 
     const currentUser = session.user;
 
-    const existingConversation  = await prisma.conversation.findUnique({
+    const existingConversation = await prisma.conversation.findUnique({
         where: {
             id: conversationId,
         },
@@ -148,7 +165,7 @@ export async function deleteConversationById(conversationId: string) {
         where: {
             id: conversationId,
             userIds: {
-                hasSome: [currentUser.id],
+                hasSome: [ currentUser.id ],
             }
         }
     });

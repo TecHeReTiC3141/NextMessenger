@@ -21,11 +21,9 @@ export default function ConversationBox({ conversation, selected }: Conversation
 
     const otherUser = useOtherUser(conversation);
 
-    const lastMessage = useMemo(() => {
-            const messages = conversation.messages || [];
-            return messages.at(-1);
-        },
-        [ conversation.messages ]);
+    const lastMessage = (conversation.messages || []).at(-1);
+
+    console.log(conversation.name, conversation.messages);
 
     const seenLastMessage = useMemo(() => {
         if (!userEmail || !lastMessage) {

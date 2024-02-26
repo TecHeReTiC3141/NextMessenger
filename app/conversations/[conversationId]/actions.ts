@@ -7,6 +7,7 @@ import { AddMessageFormSchema } from "@/app/lib/schema";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import { redirect } from "next/navigation";
+import { pusherServer } from "@/app/lib/pusher";
 
 export default async function getConversationById(conversationId: string): Promise<ConversationInList | null> {
     return prisma.conversation.findUnique({
@@ -44,6 +45,8 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
         return redirect("/");
     }
 
+    const currentUser = session.user;
+
     const curConversation = await prisma.conversation.findUnique({
         where: {
             id: conversationId,
@@ -67,16 +70,16 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
     }
     const lastMessage = curConversation.messages.at(-1);
 
-    if (!lastMessage || lastMessage.seen.filter(user => user.id === session.user.id).length > 0) {
+    if (!lastMessage || lastMessage.seen.filter(user => user.id === currentUser.id).length > 0) {
         return null;
     }
 
-    return await prisma.message.update({
+    const updatedMessage = await prisma.message.update({
         where: { id: lastMessage.id },
         data: {
             seen: {
                 connect: {
-                    id: session.user.id,
+                    id: currentUser.id,
                 }
             }
         },
@@ -85,4 +88,13 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
             sender: true,
         }
     });
+
+    await pusherServer.trigger(currentUser.email as string, "conversation:update", {
+        id: conversationId,
+        messages: [updatedMessage],
+    });
+
+    console.log("updated message", updatedMessage);
+    await pusherServer.trigger(conversationId, "message:update", updatedMessage);
+    return updatedMessage
 }

@@ -27,7 +27,7 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
         pusherClient.subscribe(conversationId);
         bottomRef?.current?.scrollIntoView();
 
-        function messageHandler(newMessage: FullMessage) {
+        function newMessageHandler(newMessage: FullMessage) {
             setMessages(prev => {
                 if (find(prev, {id: newMessage.id})) {
                     return prev;
@@ -38,11 +38,23 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
             setSeenLastMessage(conversationId).then(() => console.log("seen updated"));
         }
 
-        pusherClient.bind("message:new", messageHandler);
+        function updateMessageHandler(updatedMessage: FullMessage) {
+            setMessages(prevMessages => prevMessages.map(message => {
+                if (message.id === updatedMessage.id) {
+                    return updatedMessage;
+                }
+                return message;
+            }));
+        }
+
+        pusherClient.bind("message:new", newMessageHandler);
+        pusherClient.bind("message:update", updateMessageHandler);
+
 
         return () => {
             pusherClient.unsubscribe(conversationId);
-            pusherClient.unbind("message:new", messageHandler);
+            pusherClient.unbind("message:new", newMessageHandler);
+            pusherClient.unbind("message:update", updateMessageHandler);
         };
     }, [conversationId]);
 

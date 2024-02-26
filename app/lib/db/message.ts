@@ -12,8 +12,8 @@ interface CreateMessageData {
     image?: string,
 }
 
-type MessageWithSeen = Message & { seen: User[] };
-type MessageWithSender = Message & { sender: User | null };
+export type MessageWithSeen = Message & { seen: User[] };
+export type MessageWithSender = Message & { sender: User | null };
 export type FullMessage = MessageWithSender & MessageWithSeen;
 import { pusherServer } from "@/app/lib/pusher";
 
@@ -66,6 +66,7 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
     const lastMessage = updatedConversation.messages.at(-1);
 
     updatedConversation.users.map(async user => {
+        console.log("updated conversation", user.email, { id: conversationId, messages: [lastMessage]});
         await pusherServer.trigger(user.email as string, "conversation:update", { id: conversationId, messages: [lastMessage]});
     })
 
