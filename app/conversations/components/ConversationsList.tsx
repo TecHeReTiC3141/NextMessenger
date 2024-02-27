@@ -13,7 +13,7 @@ import { openModal } from "@/app/components/Modal";
 import { useSession } from "next-auth/react";
 import { pusherClient } from "@/app/lib/pusher";
 import { find } from "lodash";
-import { FullMessage, MessageWithSeen } from "@/app/lib/db/message";
+import { FullMessage } from "@/app/lib/db/message";
 
 
 interface ConversationsListProps {
@@ -84,7 +84,7 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
             pusherClient.unbind("conversation:update", updateConversationHandler);
             pusherClient.unbind("conversation:remove", removeConversationHandler);
         }
-    }, [ pusherKey ]);
+    }, [conversationId, pusherKey, router]);
 
     return (
         <>

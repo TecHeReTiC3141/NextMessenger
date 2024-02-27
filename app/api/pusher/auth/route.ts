@@ -1,9 +1,9 @@
 import { authOptions } from "@/app/lib/config/authOptions";
 import { pusherServer } from "@/app/lib/pusher";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest | Request) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
