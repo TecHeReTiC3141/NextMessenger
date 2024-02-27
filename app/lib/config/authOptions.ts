@@ -33,7 +33,6 @@ export const authOptions: NextAuthOptions = {
                     where: { email: credentials.email },
                 });
 
-
                 console.log("found user", user, await bcrypt.compare(credentials.password, user?.password || "",));
                 if (user && await bcrypt.compare(credentials.password, user.password || "")) {
                     const { password, ...userFields } = user;
