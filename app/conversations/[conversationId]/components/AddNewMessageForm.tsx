@@ -42,13 +42,21 @@ export default function AddNewMessageForm() {
     }
 
     async function onUpload(result: any) {
-        const data = {image: result?.info?.secure_url, conversationId, body: ""}
+        const data = { image: result?.info?.secure_url, conversationId, body: "" }
         await createNewMessage(data);
     }
+
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2 items-center border-t border-neutral px-2 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} onKeyDown={ev => {
+            if (ev.key === "Enter") {
+                ev.preventDefault();
+                const form = ev.currentTarget as HTMLFormElement;
+                console.log("submitted");
+                handleSubmit(onSubmit)();
+            }
+        }} className="flex gap-2 items-center border-t border-neutral px-2 py-4">
             <CldUploadButton
-                options={{ maxFiles: 1}}
+                options={{ maxFiles: 1 }}
                 onUpload={onUpload}
                 uploadPreset="uupnbab6"
             >
