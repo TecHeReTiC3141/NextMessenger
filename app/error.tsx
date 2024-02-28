@@ -10,18 +10,15 @@ export default function Error({
     reset: () => void;
 }) {
     useEffect(() => {
-        // Optionally log the error to an error reporting service
         console.error(error);
     }, [error]);
 
     return (
-        <main className="flex h-full flex-col items-center justify-center">
-            <h2 className="text-center">Something went wrong!</h2>
-            <p className="text-error">{error.message}</p>
+        <main className="flex min-h-full flex-col items-center justify-center gap-4">
+            <h2 className="text-center bg-error rounded-md p-2 alert-error">Something went wrong!</h2>
             <button
-                className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"
+                className="btn btn-primary"
                 onClick={
-                    // Attempt to recover by trying to re-render the invoices route
                     () => reset()
                 }
             >

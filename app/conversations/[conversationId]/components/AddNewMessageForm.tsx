@@ -36,9 +36,7 @@ export default function AddNewMessageForm() {
         reset();
         console.log(data);
         const res = await handleNewMessage(data as unknown as FormData);
-        if (res) {
-            toast.success("Successfully sent your message");
-        } else {
+        if (!res) {
             toast.error("Something went wrong while sending your message. Please try again later");
         }
     }
@@ -46,7 +44,6 @@ export default function AddNewMessageForm() {
     async function onUpload(result: any) {
         const data = {image: result?.info?.secure_url, conversationId, body: ""}
         await createNewMessage(data);
-        toast.success("Successfully sent your image");
     }
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2 items-center border-t border-neutral px-2 py-4">

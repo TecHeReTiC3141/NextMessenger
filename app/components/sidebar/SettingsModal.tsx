@@ -2,7 +2,7 @@ import { SessionUser, updateUserSettings } from "@/app/lib/db/user";
 import Modal, { closeModal, openModal } from "@/app/components/Modal";
 import { z } from "zod";
 import { UserSettingsFormSchema } from "@/app/lib/schema";
-import { Control, FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import avatarPlaceholder from "@/public/images/avatar-placeholder.jpg"
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -77,7 +77,7 @@ export default function SettingsModal({ user }: SettingsModalProps) {
                     </div>
                     <div className="flex gap-2">
                         <Image src={image || user.image || avatarPlaceholder} alt="User profile" width={288}
-                               height={288} className="rounded-full w-12 h-12"/>
+                               height={288} className="object-cover rounded-full w-12 h-12"/>
                         <CldUploadButton
                             options={{ maxFiles: 1 }}
                             onUpload={onUpload}

@@ -43,7 +43,7 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
                     return prev;
                 }
                 return [ newConversation, ...prev ];
-            })
+            });
         }
 
         function updateConversationHandler(updatedConversation: {
@@ -51,7 +51,11 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
             lastMessageAt: Date,
             messages: FullMessage[]
         }) {
+            console.log("in updated conversation", updatedConversation);
             setItems(prev => {
+                if (!updatedConversation?.messages) {
+                    return prev;
+                }
                 return prev.map(conversation => {
                     if (conversation.id !== updatedConversation.id) {
                         return conversation;
