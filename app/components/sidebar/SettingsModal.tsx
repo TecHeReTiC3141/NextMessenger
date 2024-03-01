@@ -9,6 +9,8 @@ import Image from "next/image";
 import { CldUploadButton } from "next-cloudinary";
 import toast from "react-hot-toast";
 import SubmitBtn from "@/app/components/SubmitBtn";
+import { HiArrowLeftOnRectangle } from "react-icons/hi2";
+import { signOut } from "next-auth/react";
 
 interface SettingsModalProps {
     user: NonNullable<SessionUser>,
@@ -95,18 +97,26 @@ export default function SettingsModal({ user }: SettingsModalProps) {
                         <input type="text"
                                className="input input-bordered w-full focus:ring-2 focus:ring-sky-500" {...register("description")}/>
                     </label>
-                    <div className="flex w-full justify-end">
+                    <div className="flex w-full justify-end items-end">
+                        <button className="btn btn-sm btn-ghost hover:bg-warning"
+                                onClick={ev => {
+                                    ev.preventDefault();
+                                    signOut({ callbackUrl: "/" })
+                                }}>
+                            <HiArrowLeftOnRectangle size={28}/> Logout
+                        </button>
+                        <div className="flex-1"></div>
                         <div className="modal-action  mt-4">
                             <button className="btn btn-sm rounded-lg btn-ghost mr-2" onClick={ev => {
                                 ev.preventDefault();
                                 closeModal("settings-modal");
-                            }}>Cancel</button>
-                            <SubmitBtn className="btn-sm" control={control} >Save</SubmitBtn>
+                            }}>Cancel
+                            </button>
+                            <SubmitBtn className="btn-sm" control={control}>Save</SubmitBtn>
                         </div>
                     </div>
                 </form>
             </div>
-
         </Modal>
     )
 }

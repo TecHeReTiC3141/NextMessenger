@@ -62,7 +62,6 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                                             <span
                                                 className="group-hover:font-bold p-1 rounded-lg text-sm">Delete?</span>
                                         </button>
-
                                     </li>
                                 </ul>
                             </div>
