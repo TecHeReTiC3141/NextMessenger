@@ -13,7 +13,7 @@ interface ConversationPageProps {
 export async function generateMetadata({ params: { conversationId } }: ConversationPageProps) {
     const conversation = await getConversationById(conversationId);
     return {
-        title: conversation?.name || "Not found",
+        title: conversation?.name || "Chat",
     }
 }
 
