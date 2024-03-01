@@ -10,7 +10,7 @@ export interface SidebarRoute {
     href: string,
     icon: IconType,
     active?: boolean,
-    onClick?: () => {}
+    onClick?: () => void,
 }
 
 export default function useRoutes(): SidebarRoute[] {
