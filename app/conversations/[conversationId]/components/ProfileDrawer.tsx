@@ -3,8 +3,6 @@ import useOtherUser from "@/app/hooks/useOtherUser";
 import { format } from "date-fns";
 import { IoClose } from "react-icons/io5";
 import UserAvatar from "@/app/components/UserAvatar";
-import { FaRegTrashCan } from "react-icons/fa6";
-import { openModal } from "@/app/components/Modal";
 import AvatarGroup from "@/app/components/AvatarGroup";
 import useActiveList from "@/app/hooks/useActiveList";
 
@@ -40,14 +38,8 @@ export default function ProfileDrawer({ conversation }: ProfileModalProps) {
                 }
                 <h4 className="text-lg">{title}</h4>
                 <p className="text-sm">{statusText}</p>
+                {!conversation.isGroup && <p className="text-sm">{otherUser.description}</p>}
 
-                <div className="group flex flex-col items-center">
-                    <button className="btn btn-circle btn-error btn-ghost btn-sm hover:bg-error"
-                            onClick={() => openModal("delete-conversation")}>
-                        <FaRegTrashCan/>
-                    </button>
-                    <p className="group-hover:font-bold p-1 rounded-lg text-sm">Delete?</p>
-                </div>
             </div>
             {conversation.isGroup
                 ? <>

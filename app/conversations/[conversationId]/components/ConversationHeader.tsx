@@ -3,13 +3,13 @@
 import { ConversationInList } from "@/app/lib/db/conversation";
 import useOtherUser from "@/app/hooks/useOtherUser";
 import Link from "next/link";
-import { FaArrowLeft } from "react-icons/fa6";
+import { FaArrowLeft, FaEllipsisVertical, FaRegTrashCan } from "react-icons/fa6";
 import UserAvatar from "@/app/components/UserAvatar";
-import { FaEllipsisVertical } from "react-icons/fa6";
 import ProfileDrawer from "@/app/conversations/[conversationId]/components/ProfileDrawer";
 import ConfirmDeleteModal from "@/app/conversations/[conversationId]/components/ConfirmDeleteModal";
 import AvatarGroup from "@/app/components/AvatarGroup";
 import useActiveList from "@/app/hooks/useActiveList";
+import { openModal } from "@/app/components/Modal";
 
 
 interface ConversationHeaderProps {
@@ -40,14 +40,32 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                             <AvatarGroup users={conversation.users}/> :
                             <UserAvatar user={otherUser} width={36} height={36}/>
                         }
-                        <div className="flex-1">
-                            <h2 className="text-xl font-bold">{conversation.name || otherUser.name}</h2>
-                            <p className="text-sm">{statusText}</p>
-                        </div>
                         <label htmlFor="profile-drawer-toggle"
-                               className="rounded-full p-2 hover:bg-sky-100 cursor-pointer">
-                            <FaEllipsisVertical size={24}
-                                                className=" text-sky-500 hover:text-sky-600  transition"/>
+                               className=" cursor-pointer flex-1 flex justify-between items-center">
+                            <div className="">
+                                <h2 className="text-xl font-bold">{conversation.name || otherUser.name}</h2>
+                                <p className="text-sm">{statusText}</p>
+                            </div>
+                            <div className="dropdown dropdown-bottom dropdown-end" onClick={ev => ev.preventDefault()}>
+                                <div tabIndex={0} role="button"
+                                     className="bg-transparent m-1 p-2 hover:bg-sky-100 rounded-full">
+                                    <FaEllipsisVertical size={24}
+                                                        className=" text-sky-500 hover:text-sky-600  transition"/></div>
+                                <ul tabIndex={0}
+                                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 gap-2">
+                                    <li className="w-full  group">
+                                        <button className="w-full justify-start btn btn-ghost"
+                                                onClick={() => openModal("delete-conversation")}>
+                                            <span className="rounded-full p-2 group-hover:bg-error">
+                                                <FaRegTrashCan className="text-lg "/>
+                                            </span>
+                                            <span
+                                                className="group-hover:font-bold p-1 rounded-lg text-sm">Delete?</span>
+                                        </button>
+
+                                    </li>
+                                </ul>
+                            </div>
                         </label>
                     </div>
                 </div>
