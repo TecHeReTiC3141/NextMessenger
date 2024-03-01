@@ -7,6 +7,8 @@ import { SessionUser } from "@/app/lib/db/user";
 import UserAvatar from "@/app/components/UserAvatar";
 import SettingsModal from "@/app/components/sidebar/SettingsModal";
 import { openModal } from "@/app/components/Modal";
+import logo from "@/public/images/logo.png";
+import Image from "next/image";
 
 interface DesktopSidebarProps {
     user: NonNullable<SessionUser>,
@@ -28,6 +30,10 @@ export default function DesktopSidebar({ user }: DesktopSidebarProps) {
                         ))}
                     </ul>
                 </nav>
+                <div className="-rotate-90 flex gap-4 items-center select-none">
+                    <Image src={logo} alt="Logo" width={40} height={40}/>
+                    <h3 className="uppercase select-none text-nowrap text-3xl text-sky-500 font-bold">Next Messenger</h3>
+                </div>
                 <button onClick={() => openModal("settings-modal")}>
                     <UserAvatar user={user} width={40} height={40}/>
                 </button>
