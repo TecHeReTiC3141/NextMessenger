@@ -10,12 +10,12 @@ interface ConversationPageProps {
     }
 }
 
-export async function generateMetadata({ params: { conversationId } }: ConversationPageProps) {
-    const conversation = await getConversationById(conversationId);
-    return {
-        title: conversation?.name || "Chat",
-    }
-}
+// export async function generateMetadata({ params: { conversationId } }: ConversationPageProps) {
+//     const conversation = await getConversationById(conversationId);
+//     return {
+//         title: conversation?.name || "Chat",
+//     }
+// }
 
 export default async function ConversationPage({ params: { conversationId } }: ConversationPageProps) {
 

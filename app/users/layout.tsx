@@ -9,7 +9,7 @@ export default async function UsersLayout({ children }: { children: React.ReactN
     return (
         <Sidebar>
             <div className="h-full">
-                <UsersList items={users}/>
+                <UsersList initialItems={users}/>
                 {children}
             </div>
         </Sidebar>
