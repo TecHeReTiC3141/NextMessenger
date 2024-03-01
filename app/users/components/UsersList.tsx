@@ -21,7 +21,9 @@ export default function UsersList({ initialItems }: UsersListProps) {
 
     function handleUserSearch(ev: ChangeEvent<HTMLInputElement>) {
         const userSearchInput = ev.currentTarget as HTMLInputElement;
-        setItems(fuse.search(userSearchInput.value).map(res => res.item));
+        console.log(userSearchInput.value);
+        setItems(!userSearchInput.value ? initialItems :
+            fuse.search(userSearchInput.value).map(res => res.item));
     }
 
     return (
