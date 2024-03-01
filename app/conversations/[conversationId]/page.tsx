@@ -10,6 +10,13 @@ interface ConversationPageProps {
     }
 }
 
+export async function generateMetadata({ params: { conversationId } }: ConversationPageProps) {
+    const conversation = await getConversationById(conversationId);
+    return {
+        title: conversation?.name || "Not found",
+    }
+}
+
 export default async function ConversationPage({ params: { conversationId } }: ConversationPageProps) {
 
     const conversation = await getConversationById(conversationId);
@@ -21,9 +28,9 @@ export default async function ConversationPage({ params: { conversationId } }: C
     return (
         <div className="lg:pl-80 h-full max-h-full">
             <div className="h-full flex flex-col">
-                <ConversationHeader conversation={conversation} />
-                <ConversationBody initialMessages={conversation.messages} />
-                <AddNewMessageForm  />
+                <ConversationHeader conversation={conversation}/>
+                <ConversationBody initialMessages={conversation.messages}/>
+                <AddNewMessageForm/>
             </div>
         </div>
     )

@@ -8,8 +8,11 @@ import ActiveStatus from "@/app/components/ActiveStatus";
 const inter = Inter({ subsets: [ "latin" ] });
 
 export const metadata: Metadata = {
-    title: "Messaging clone app",
-    description: "Made after Antonio",
+    title: {
+        template: "%s | Next Messenger",
+        default: "Next Messenger"
+    },
+    description: "Simple messaging app",
 };
 
 export default function RootLayout({ children }: Readonly<{
@@ -18,11 +21,11 @@ export default function RootLayout({ children }: Readonly<{
     return (
         <html lang="en">
         <body className={inter.className}>
-            <SessionProvider>
-                <ActiveStatus />
-                <ToasterContext/>
-                {children}
-            </SessionProvider>
+        <SessionProvider>
+            <ActiveStatus/>
+            <ToasterContext/>
+            {children}
+        </SessionProvider>
         </body>
         </html>
     );

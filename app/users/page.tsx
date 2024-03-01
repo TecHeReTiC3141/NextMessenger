@@ -1,5 +1,9 @@
-import { signOut } from "next-auth/react";
 import EmptyState from "@/app/components/EmptyState";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Users",
+}
 
 export default function UsersPage() {
     return (
