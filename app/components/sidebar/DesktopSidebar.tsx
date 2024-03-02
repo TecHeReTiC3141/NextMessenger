@@ -32,7 +32,8 @@ export default function DesktopSidebar({ user }: DesktopSidebarProps) {
                 </nav>
                 <div className="-rotate-90 flex gap-4 items-center select-none">
                     <Image src={logo} alt="Logo" width={40} height={40}/>
-                    <h3 className="uppercase select-none text-nowrap text-3xl text-sky-500 font-bold">Next Messenger</h3>
+                    <h3 className="uppercase select-none text-nowrap text-3xl text-sky-500 font-bold drop-shadow-lg">
+                        Next Messenger</h3>
                 </div>
                 <button onClick={() => openModal("settings-modal")}>
                     <UserAvatar user={user} width={40} height={40}/>

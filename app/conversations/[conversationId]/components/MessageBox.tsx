@@ -1,13 +1,10 @@
 import { FullMessage } from "@/app/lib/db/message";
 import { useSession } from "next-auth/react";
-import { SessionUser } from "@/app/lib/db/user";
 import clsx from "clsx";
 import UserAvatar from "@/app/components/UserAvatar";
 import { User } from "@prisma/client";
 import { format } from "date-fns";
-import Image from "next/image";
-import ImageModal from "@/app/conversations/[conversationId]/components/ImageModal";
-import { openModal } from "@/app/components/Modal";
+import MessageImage from "@/app/conversations/[conversationId]/components/MessageImage";
 
 interface MessageBoxProps {
     message: FullMessage,
@@ -15,6 +12,8 @@ interface MessageBoxProps {
 }
 
 export default function MessageBox({ message, isLast }: MessageBoxProps) {
+
+    // TODO: Open dropdown menu with actions when clicked
 
     const session = useSession();
 
@@ -38,18 +37,15 @@ export default function MessageBox({ message, isLast }: MessageBoxProps) {
                 <time className="text-xs opacity-50">{format(message.createdAt, "p")}</time>
             </div>
             {
-                message.image ?
-                    <>
-                        <ImageModal src={message.image}/>
-                        <button className="overflow-hidden" onClick={() => openModal(`image-modal-${message.image}`)}>
-                            <Image src={message.image} alt="Message image" width={288} height={288}
-                                   className="object-cover rounded-md cursor-pointer hover:scale-110 transition"/>
-                        </button>
-                    </> :
+                message.image && !message.body ?
+                    <MessageImage image={message.image}/>
+                    :
                     <div
-                        className={clsx("chat-bubble", isOwnMessage ? "bg-primary" : "bg-base-300 text-base-content")}>
-                        {message.body}
+                        className={clsx("chat-bubble", isOwnMessage ? "bg-primary" : "bg-base-300 text-base-content flex-col gap-3")}>
+                        <p>{message.body}</p>
+                        <MessageImage image={message.image}/>
                     </div>
+
             }
             {isOwnMessage && isLast && seenList.length > 0 && (
                 <div className="chat-footer text-xs">

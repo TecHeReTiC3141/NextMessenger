@@ -68,7 +68,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                         </label>
                     </div>
                 </div>
-                <div className="drawer-side z-50">
+                <div className="drawer-side z-50 overflow-hidden">
                     <label htmlFor="profile-drawer-toggle" aria-label="close sidebar"
                            className="drawer-overlay"></label>
                     <ProfileDrawer conversation={conversation}/>

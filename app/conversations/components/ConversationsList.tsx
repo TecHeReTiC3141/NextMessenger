@@ -23,6 +23,8 @@ interface ConversationsListProps {
 
 export default function ConversationsList({ initialItems, otherUsers }: ConversationsListProps) {
 
+    // TODO: show number of unseen messages somewhere
+
     const session = useSession();
     const [ items, setItems ] = useState(initialItems);
     const router = useRouter();

@@ -12,10 +12,17 @@ export const RegisterFormSchema = LoginFormSchema.extend({
 });
 
 export const AddMessageFormSchema = z.object({
-    message: z.string().min(1, "Message must not be empty"),
+    message: z.string().optional(),
     image: z.string().optional(),
     conversationId: z.string().min(1, "Internal error with conversationId"),
-});
+}).refine(
+    data => {
+        if (!data.message && !data.image) {
+            return { message: 'Either message or image must be present' };
+        }
+        return true;
+    }
+);
 
 export const UserSettingsFormSchema = z.object({
     name: nameInput,
