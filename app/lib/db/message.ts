@@ -8,9 +8,9 @@ import { revalidatePath } from "next/cache";
 import { pusherServer } from "@/app/lib/pusher";
 
 interface CreateMessageData {
-    body: string,
-    conversationId: string,
+    body?: string,
     image?: string,
+    conversationId: string,
 }
 
 export type MessageWithSeen = Message & { seen: User[] };
