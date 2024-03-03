@@ -5,7 +5,7 @@ import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
 import { Message, User } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { pusherServer } from "@/app/lib/pusher";
+import { getPusherInstance } from "@/app/lib/pusher";
 
 interface CreateMessageData {
     body?: string,
@@ -61,12 +61,12 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
         }
     });
 
-    await pusherServer.trigger(conversationId, "message:new", newMessage);
+    await getPusherInstance().trigger(conversationId, "message:new", newMessage);
 
     const lastMessage = updatedConversation.messages.at(-1);
 
     updatedConversation.users.map(async user => {
-        await pusherServer.trigger(user.email as string, "conversation:update",
+        await getPusherInstance().trigger(user.email as string, "conversation:update",
             { id: conversationId, lastMessageAt: updatedConversation.lastMessageAt, messages: [ lastMessage ] });
     })
     revalidatePath("/conversations/[conversationId]", "page");
@@ -92,7 +92,7 @@ export async function deleteMessageById(messageId: string) {
     }
     console.log("deleted message", deletedMessage);
     if (!deletedMessage.conversationId) return;
-    await pusherServer.trigger(deletedMessage.conversationId, "message:delete", { id: messageId });
+    await getPusherInstance().trigger(deletedMessage.conversationId, "message:delete", { id: messageId });
     const updatedConversation = await prisma.conversation.findUnique({
         where: {
             id: deletedMessage.conversationId,
@@ -107,7 +107,7 @@ export async function deleteMessageById(messageId: string) {
     });
     if (updatedConversation && deletedMessage.createdAt === updatedConversation.lastMessageAt) {
         updatedConversation.users.map(async user => {
-            await pusherServer.trigger(user.email as string, "conversation:deleteLastMessage",
+            await getPusherInstance().trigger(user.email as string, "conversation:deleteLastMessage",
                 {conversationId: updatedConversation.id});
         });
     }

@@ -7,7 +7,7 @@ import { AddMessageFormSchema } from "@/app/lib/schema";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import { redirect } from "next/navigation";
-import { pusherServer } from "@/app/lib/pusher";
+import { getPusherInstance } from "@/app/lib/pusher";
 
 export default async function getConversationById(conversationId: string): Promise<ConversationInList | null> {
     return prisma.conversation.findUnique({
@@ -89,13 +89,13 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
         }
     });
 
-    await pusherServer.trigger(currentUser.email as string, "conversation:update", {
+    await getPusherInstance().trigger(currentUser.email as string, "conversation:update", {
         id: conversationId,
         messages: [updatedMessage],
         lastMessageAt: curConversation.lastMessageAt,
     });
 
     console.log("updated message", updatedMessage);
-    await pusherServer.trigger(conversationId, "message:update", updatedMessage);
+    await getPusherInstance().trigger(conversationId, "message:update", updatedMessage);
     return updatedMessage
 }

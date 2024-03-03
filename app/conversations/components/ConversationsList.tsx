@@ -34,6 +34,7 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
 
     const { conversationId, isOpen } = useConversation();
 
+
     useEffect(() => {
         if (!pusherKey) {
             return;

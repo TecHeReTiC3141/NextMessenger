@@ -6,7 +6,7 @@ import prisma from "@/app/lib/db/prisma";
 import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { CreateGroupChatSchema } from "@/app/lib/schema";
-import { pusherClient, pusherServer } from "@/app/lib/pusher";
+import { getPusherInstance } from "@/app/lib/pusher";
 
 
 export type ConversationWithUsers = Prisma.ConversationGetPayload<{
@@ -55,7 +55,7 @@ export async function createChat({ userId }: ChatCreateData): Promise<Conversati
 
     newConversation.users.forEach(user => {
         if (user.email) {
-            pusherServer.trigger(user.email, "conversation:new", newConversation);
+            getPusherInstance().trigger(user.email, "conversation:new", newConversation);
         }
     })
 
@@ -93,7 +93,7 @@ export async function createGroupChat(data: FormData): Promise<ConversationWithU
 
     newConversation.users.forEach(user => {
         if (user.email) {
-            pusherServer.trigger(user.email, "conversation:new", newConversation);
+            getPusherInstance().trigger(user.email, "conversation:new", newConversation);
         }
     });
 
@@ -175,7 +175,7 @@ export async function deleteConversationById(conversationId: string) {
 
     existingConversation.users.forEach(user => {
         if (user.email) {
-            pusherServer.trigger(user.email, "conversation:remove", existingConversation);
+            getPusherInstance().trigger(user.email, "conversation:remove", existingConversation);
         }
     })
 

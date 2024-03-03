@@ -1,9 +1,10 @@
 import { authOptions } from "@/app/lib/config/authOptions";
-import { pusherServer } from "@/app/lib/pusher";
+import { getPusherInstance } from "@/app/lib/pusher";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest | Request) {
+
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest | Request) {
         user_id: session.user.email,
     };
 
-    const authResponse = pusherServer.authorizeChannel(socketId, channelName, data);
+    const authResponse = getPusherInstance().authorizeChannel(socketId, channelName, data);
     return NextResponse.json(authResponse);
 }
 
