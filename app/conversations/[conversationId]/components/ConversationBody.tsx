@@ -1,12 +1,12 @@
 "use client"
 
 import { FullMessage } from "@/app/lib/db/message";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import useConversation from "@/app/hooks/useConversation";
 import MessageBox from "@/app/conversations/[conversationId]/components/MessageBox";
 import { setSeenLastMessage } from "@/app/conversations/[conversationId]/actions";
 import { pusherClient } from "@/app/lib/pusher";
-import {find} from "lodash";
+import { find } from "lodash";
 
 interface ConversationBodyProps {
     initialMessages: FullMessage[],
@@ -15,13 +15,15 @@ interface ConversationBodyProps {
 export default function ConversationBody({ initialMessages }: ConversationBodyProps) {
 
     const [ messages, setMessages ] = useState(initialMessages);
+    const [ messageWithActionMenu, setMessageWithActionMenu ] = useState<string>("");
+
     const bottomRef = useRef<HTMLDivElement>(null);
 
     const { conversationId } = useConversation();
 
-    useEffect( () => {
+    useEffect(() => {
         setSeenLastMessage(conversationId).then(() => console.log("seen updated"));
-    }, [conversationId]);
+    }, [ conversationId ]);
 
     useEffect(() => {
         pusherClient.subscribe(conversationId);
@@ -29,10 +31,10 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
 
         function newMessageHandler(newMessage: FullMessage) {
             setMessages(prev => {
-                if (find(prev, {id: newMessage.id})) {
+                if (find(prev, { id: newMessage.id })) {
                     return prev;
                 }
-                return [...prev, newMessage];
+                return [ ...prev, newMessage ];
             });
             bottomRef?.current?.scrollIntoView();
             setSeenLastMessage(conversationId).then(() => console.log("seen updated"));
@@ -56,14 +58,16 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
             pusherClient.unbind("message:new", newMessageHandler);
             pusherClient.unbind("message:update", updateMessageHandler);
         };
-    }, [conversationId]);
+    }, [ conversationId ]);
 
     return (
-        <div className="flex-1 bg-base-200 px-2 overflow-y-auto">
+        <div className="flex-1 bg-base-200 px-2 overflow-y-auto" onClick={() => setMessageWithActionMenu("")}>
             {messages.map((message, index) => (
-                <MessageBox message={message} isLast={index === messages.length - 1} key={message.id} />
+                <MessageBox message={message} isLast={index === messages.length - 1} key={message.id}
+                            messageWithActionMenu={messageWithActionMenu}
+                            setMessageWithActionMenu={setMessageWithActionMenu}/>
             ))}
-            <div ref={bottomRef} className="pt-24" />
+            <div ref={bottomRef} className="pt-24"/>
         </div>
     )
 }
