@@ -5,6 +5,7 @@ import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
 import { Message, User } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { pusherServer } from "@/app/lib/pusher";
 
 interface CreateMessageData {
     body: string,
@@ -15,7 +16,6 @@ interface CreateMessageData {
 export type MessageWithSeen = Message & { seen: User[] };
 export type MessageWithSender = Message & { sender: User | null };
 export type FullMessage = MessageWithSender & MessageWithSeen;
-import { pusherServer } from "@/app/lib/pusher";
 
 export async function createNewMessage({ body, image, conversationId }: CreateMessageData): Promise<FullMessage> {
     const session = await getServerSession(authOptions);
@@ -71,5 +71,45 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
     })
     revalidatePath("/conversations/[conversationId]", "page");
     return newMessage;
+}
+
+export async function deleteMessageById(messageId: string) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const deletedMessage = await prisma.message.delete({
+        where: {
+            id: messageId,
+            senderId: session.user.id,
+        }
+    });
+
+    if (deletedMessage === null) {
+        throw new Error("Couldn't find your message or it's not yours");
+    }
+    console.log("deleted message", deletedMessage);
+    if (!deletedMessage.conversationId) return;
+    await pusherServer.trigger(deletedMessage.conversationId, "message:delete", { id: messageId });
+    const updatedConversation = await prisma.conversation.findUnique({
+        where: {
+            id: deletedMessage.conversationId,
+        },
+        include: {
+            users: {
+                select: {
+                    email: true,
+                }
+            },
+        }
+    });
+    if (updatedConversation && deletedMessage.createdAt === updatedConversation.lastMessageAt) {
+        updatedConversation.users.map(async user => {
+            await pusherServer.trigger(user.email as string, "conversation:deleteLastMessage",
+                {conversationId: updatedConversation.id});
+        });
+    }
 }
 

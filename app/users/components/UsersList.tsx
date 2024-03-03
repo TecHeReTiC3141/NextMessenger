@@ -35,7 +35,7 @@ export default function UsersList({ initialItems }: UsersListProps) {
                         People
                     </div>
                     <label
-                        className="input input-bordered input-sm flex items-center py-3 gap-3 lg:flex-1 max-w-sm border-none">
+                        className="input input-sm flex items-center py-3 gap-3 lg:flex-1 max-w-sm border-none">
                         <input type="text" placeholder="Search users..." className="lg:max-w-40 flex-grow border-none" onChange={handleUserSearch}/>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
                              className="w-4 h-4 opacity-70">

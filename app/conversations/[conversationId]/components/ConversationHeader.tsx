@@ -6,7 +6,8 @@ import Link from "next/link";
 import { FaArrowLeft, FaEllipsisVertical, FaRegTrashCan } from "react-icons/fa6";
 import UserAvatar from "@/app/components/UserAvatar";
 import ProfileDrawer from "@/app/conversations/[conversationId]/components/ProfileDrawer";
-import ConfirmDeleteModal from "@/app/conversations/[conversationId]/components/ConfirmDeleteModal";
+import ConfirmConversationDeleteModal
+    from "@/app/conversations/[conversationId]/components/ConfirmConversationDeleteModal";
 import AvatarGroup from "@/app/components/AvatarGroup";
 import useActiveList from "@/app/hooks/useActiveList";
 import { openModal } from "@/app/components/Modal";
@@ -74,7 +75,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                     <ProfileDrawer conversation={conversation}/>
                 </div>
             </div>
-            <ConfirmDeleteModal/>
+            <ConfirmConversationDeleteModal/>
         </>
 
     )

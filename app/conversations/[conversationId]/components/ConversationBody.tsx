@@ -3,7 +3,7 @@
 import { FullMessage } from "@/app/lib/db/message";
 import { useEffect, useRef, useState } from "react";
 import useConversation from "@/app/hooks/useConversation";
-import MessageBox from "@/app/conversations/[conversationId]/components/MessageBox";
+import MessageBox from "@/app/conversations/[conversationId]/components/message/MessageBox";
 import { setSeenLastMessage } from "@/app/conversations/[conversationId]/actions";
 import { pusherClient } from "@/app/lib/pusher";
 import { find } from "lodash";
@@ -30,6 +30,7 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
         bottomRef?.current?.scrollIntoView();
 
         function newMessageHandler(newMessage: FullMessage) {
+            console.log("new message", newMessage);
             setMessages(prev => {
                 if (find(prev, { id: newMessage.id })) {
                     return prev;
@@ -49,14 +50,23 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
             }));
         }
 
+        function deletedMessageHandler(deletedMessage: { id: string }) {
+            console.log("deleted message", deletedMessage);
+            setMessages(prevMessages => prevMessages.filter(message =>
+                message.id !== deletedMessage.id
+            ));
+        }
+
         pusherClient.bind("message:new", newMessageHandler);
         pusherClient.bind("message:update", updateMessageHandler);
+        pusherClient.bind("message:delete", deletedMessageHandler);
 
 
         return () => {
             pusherClient.unsubscribe(conversationId);
             pusherClient.unbind("message:new", newMessageHandler);
             pusherClient.unbind("message:update", updateMessageHandler);
+            pusherClient.unbind("message:delete", deletedMessageHandler);
         };
     }, [ conversationId ]);
 
