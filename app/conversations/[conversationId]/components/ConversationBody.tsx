@@ -30,7 +30,6 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
         bottomRef?.current?.scrollIntoView();
 
         function newMessageHandler(newMessage: FullMessage) {
-            console.log("new message", newMessage);
             setMessages(prev => {
                 if (find(prev, { id: newMessage.id })) {
                     return prev;
@@ -71,7 +70,10 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
     }, [ conversationId ]);
 
     return (
-        <div className="flex-1 bg-base-200 px-2 overflow-y-auto" onClick={() => setMessageWithActionMenu("")}>
+        <div className="flex-1 bg-base-200 px-2 overflow-y-auto"
+             onClick={() => setMessageWithActionMenu("")}
+             onScroll={() => setMessageWithActionMenu("")}
+            >
             {messages.map((message, index) => (
                 <MessageBox message={message} isLast={index === messages.length - 1} key={message.id}
                             messageWithActionMenu={messageWithActionMenu}

@@ -54,7 +54,7 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
             lastMessageAt: Date,
             messages: FullMessage[]
         }) {
-            console.log("in updated conversation", updatedConversation);
+            console.log(`in updated conversation`, updatedConversation);
             setItems(prev => {
                 if (!updatedConversation?.messages) {
                     return prev;
@@ -80,18 +80,34 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
             }
         }
 
+        function deleteLastMessageFromConversationHandler(updatedConversation: { id: string, messages: FullMessage[] }) {
+            setItems(prev =>
+
+                prev.map(conversation => {
+                    if (conversation.id !== updatedConversation.id) {
+                        return conversation;
+                    }
+                    return {
+                        ...conversation,
+                        messages: updatedConversation.messages
+                    };
+                }));
+        }
+
         pusherClient.subscribe(pusherKey);
         pusherClient.bind("conversation:new", newConversationHandler);
         pusherClient.bind("conversation:update", updateConversationHandler);
         pusherClient.bind("conversation:remove", removeConversationHandler);
+        pusherClient.bind("conversation:deleteLastMessage", deleteLastMessageFromConversationHandler);
 
         return () => {
             pusherClient.unsubscribe(pusherKey);
             pusherClient.unbind("conversation:new", newConversationHandler);
             pusherClient.unbind("conversation:update", updateConversationHandler);
             pusherClient.unbind("conversation:remove", removeConversationHandler);
+            pusherClient.unbind("conversation:deleteLastMessage", deleteLastMessageFromConversationHandler);
         }
-    }, [conversationId, pusherKey, router]);
+    }, [ conversationId, pusherKey, router ]);
 
     return (
         <>

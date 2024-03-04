@@ -17,7 +17,7 @@ const fuseOptions: IFuseOptions<User> = {
 
 export default function UsersList({ initialItems }: UsersListProps) {
     const [ items, setItems ] = useState(initialItems);
-    const fuse = useMemo(() => new Fuse(initialItems, fuseOptions), [ items ]);
+    const fuse = useMemo(() => new Fuse(initialItems, fuseOptions), [initialItems]);
 
     function handleUserSearch(ev: ChangeEvent<HTMLInputElement>) {
         const userSearchInput = ev.currentTarget as HTMLInputElement;

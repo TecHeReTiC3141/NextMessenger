@@ -90,7 +90,6 @@ export async function deleteMessageById(messageId: string) {
     if (deletedMessage === null) {
         throw new Error("Couldn't find your message or it's not yours");
     }
-    console.log("deleted message", deletedMessage);
     if (!deletedMessage.conversationId) return;
     await getPusherInstance().trigger(deletedMessage.conversationId, "message:delete", { id: messageId });
     const updatedConversation = await prisma.conversation.findUnique({
@@ -103,13 +102,42 @@ export async function deleteMessageById(messageId: string) {
                     email: true,
                 }
             },
-        }
+            messages: {
+                select: {
+                    id: true,
+                    createdAt: true,
+                },
+                orderBy: {
+                    createdAt: "asc",
+                }
+            }
+        },
     });
-    if (updatedConversation && deletedMessage.createdAt === updatedConversation.lastMessageAt) {
-        updatedConversation.users.map(async user => {
-            await getPusherInstance().trigger(user.email as string, "conversation:deleteLastMessage",
-                {conversationId: updatedConversation.id});
-        });
+    if (!updatedConversation) {
+        return;
+    }
+
+    console.log(updatedConversation?.messages, deletedMessage.createdAt, updatedConversation?.lastMessageAt);
+    if (updatedConversation && deletedMessage.createdAt.getTime() === updatedConversation.lastMessageAt.getTime()) {
+        const lastMessage = updatedConversation.messages.at(-1);
+        if (lastMessage) {
+            const newUpdatedConversation = await prisma.conversation.update({
+                where: {
+                    id: updatedConversation.id,
+                },
+                data: {
+                    lastMessageAt: lastMessage.createdAt,
+                },
+                select: {
+                    id: true,
+                    messages: true,
+                }
+            });
+            updatedConversation.users.map(async user => {
+                await getPusherInstance().trigger(user.email as string, "conversation:deleteLastMessage",
+                    { id: updatedConversation.id, messages: newUpdatedConversation.messages });
+            });
+        }
     }
 }
 
