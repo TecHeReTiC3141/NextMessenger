@@ -1,4 +1,4 @@
-import getConversationById from "@/app/conversations/[conversationId]/actions";
+import getConversationById, { getEditedMessage } from "@/app/conversations/[conversationId]/actions";
 import { redirect } from "next/navigation";
 import ConversationHeader from "@/app/conversations/[conversationId]/components/ConversationHeader";
 import ConversationBody from "@/app/conversations/[conversationId]/components/ConversationBody";
@@ -7,17 +7,13 @@ import AddNewMessageForm from "@/app/conversations/[conversationId]/components/A
 interface ConversationPageProps {
     params: {
         conversationId: string,
+    },
+    searchParams: {
+        edited?: string,
     }
 }
 
-// export async function generateMetadata({ params: { conversationId } }: ConversationPageProps) {
-//     const conversation = await getConversationById(conversationId);
-//     return {
-//         title: conversation?.name || "Chat",
-//     }
-// }
-
-export default async function ConversationPage({ params: { conversationId } }: ConversationPageProps) {
+export default async function ConversationPage({ params: { conversationId }, searchParams: {edited} }: ConversationPageProps) {
 
     const conversation = await getConversationById(conversationId);
 
@@ -25,12 +21,15 @@ export default async function ConversationPage({ params: { conversationId } }: C
         return redirect("/404");
     }
 
+    let editedMessage = edited ?  await getEditedMessage(edited) : null;
+
+
     return (
         <div className="lg:pl-80 h-full max-h-full">
             <div className="h-full flex flex-col">
                 <ConversationHeader conversation={conversation}/>
                 <ConversationBody initialMessages={conversation.messages}/>
-                <AddNewMessageForm/>
+                <AddNewMessageForm editedMessage={editedMessage}/>
             </div>
         </div>
     )

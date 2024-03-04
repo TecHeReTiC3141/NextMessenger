@@ -8,6 +8,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import { redirect } from "next/navigation";
 import { getPusherInstance } from "@/app/lib/pusher";
+import { Message } from "@prisma/client";
 
 export default async function getConversationById(conversationId: string): Promise<ConversationInList | null> {
     return prisma.conversation.findUnique({
@@ -98,4 +99,12 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
     console.log("updated message", updatedMessage);
     await getPusherInstance().trigger(conversationId, "message:update", updatedMessage);
     return updatedMessage
+}
+
+export async function getEditedMessage(editedId: string): Promise<Message | null> {
+    return prisma.message.findUnique({
+        where: {
+            id: editedId,
+        }
+    });
 }

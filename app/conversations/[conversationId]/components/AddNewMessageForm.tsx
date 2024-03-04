@@ -12,15 +12,26 @@ import toast from "react-hot-toast";
 import { CldUploadButton } from "next-cloudinary";
 import Image from "next/image";
 import { FaXmark } from "react-icons/fa6";
+import { Message } from ".prisma/client";
+import React, { useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 
 type formFields = z.infer<typeof AddMessageFormSchema>;
 
-export default function AddNewMessageForm() {
+interface AddNewMessageFormProps {
+    editedMessage: Message | null
+}
+
+export default function AddNewMessageForm({ editedMessage }: AddNewMessageFormProps) {
 
     const { conversationId } = useConversation();
 
     // TODO: add Tenor client for gifs
+
+    const pathname = usePathname(), searchParams = useSearchParams();
+
+    const { replace } = useRouter();
 
     const {
         register,
@@ -33,9 +44,18 @@ export default function AddNewMessageForm() {
     } = useForm<formFields>({
         resolver: zodResolver(AddMessageFormSchema),
         defaultValues: {
+            message: editedMessage?.body || "",
             image: "",
         }
     });
+
+    useEffect(() => {
+        if (editedMessage) {
+            setValue("message", editedMessage.body as string);
+            setValue("image", editedMessage.image as string);
+        }
+    }, [ editedMessage, setValue ]);
+
 
     const watchImage = watch("image");
     const watchMessage = watch("message");
@@ -54,8 +74,28 @@ export default function AddNewMessageForm() {
         setValue("image", result?.info?.secure_url || "");
     }
 
+    function handleCloseEdit() {
+        const searchParamsWithoutEdit = new URLSearchParams(searchParams);
+        searchParamsWithoutEdit.delete("edited");
+        replace(`${pathname}?${searchParamsWithoutEdit.toString()}`);
+        setValue("message", "");
+        setValue("image", "");
+    }
+
     return (
-        <div className="w-full">
+        <div className="w-full relative">
+
+            {editedMessage && (
+                <div
+                    className="absolute w-full bottom-full left-0 px-2 py-1 bg-base-300 flex justify-between items-center">
+                    <div>
+                        <p className="text-sm text-sky-500">Editing...</p>
+                        {editedMessage.body}
+                    </div>
+                    <button className="btn btn-sm btn-circle btn-ghost" onClick={handleCloseEdit}>✕</button>
+
+                </div>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} onKeyDown={ev => {
                 if (ev.key === "Enter") {
@@ -83,7 +123,8 @@ export default function AddNewMessageForm() {
             </form>
             {watchImage &&
                 <div className="relative w-32 h-32 shadow rounded-md overflow-hidden ml-3 mb-1">
-                    <button className="btn btn-ghost btn-xs btn-circle absolute top-1 right-1" onClick={() => setValue("image", "")}>
+                    <button className="btn btn-ghost btn-xs btn-circle absolute top-1 right-1"
+                            onClick={() => setValue("image", "")}>
                         <FaXmark size={20}/>
                     </button>
                     <Image src={watchImage} alt="Message photo" width={280} height={280}

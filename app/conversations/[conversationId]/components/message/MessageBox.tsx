@@ -12,36 +12,26 @@ import { FiEdit3 } from "react-icons/fi";
 import ConfirmMessageDeleteModal
     from "@/app/conversations/[conversationId]/components/message/ConfirmMessageDeleteModal";
 import { openModal } from "@/app/components/Modal";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface MessageBoxProps {
     message: FullMessage,
     isLast: boolean,
     messageWithActionMenu: string,
-    setMessageWithActionMenu: Dispatch<SetStateAction<string>>
+    setMessageWithActionMenu: Dispatch<SetStateAction<string>>,
 }
 
 export default function MessageBox({
                                        message,
                                        isLast,
                                        messageWithActionMenu,
-                                       setMessageWithActionMenu
+                                       setMessageWithActionMenu,
                                    }: MessageBoxProps) {
 
-    // TODO: Open dropdown menu with actions when clicked
     // TODO: Implement answering to certain message
 
     const [ isContextMenuVisible, setContextMenuVisible ] = useState(false);
     const [ contextMenuPosition, setContextMenuPosition ] = useState({ x: 0, y: 0 });
-
-    const handleAction1Click = () => {
-        // Handle action 1 click
-        setContextMenuVisible(false);
-    };
-
-    const handleAction2Click = () => {
-        // Handle action 2 click
-        setContextMenuVisible(false);
-    };
 
     const session = useSession();
 
@@ -49,13 +39,23 @@ export default function MessageBox({
 
     const isOwnMessage = user?.id === message.senderId;
 
+    const pathname = usePathname(), searchParams = useSearchParams();
+
+    const { replace } = useRouter();
+
     const seenList = message.seen
         .filter(user => user.id !== message.senderId)
         .map(user => user.name)
         .join(", ");
+
+    function handleEdit() {
+        const searchParamsWithEdited = new URLSearchParams({ 'edited': message.id });
+        replace(`${pathname}?${searchParamsWithEdited.toString()}`);
+    }
+
     return (
         <>
-            <ConfirmMessageDeleteModal message={message} />
+            <ConfirmMessageDeleteModal message={message}/>
             <div className={clsx("chat", isOwnMessage ? "chat-end" : "chat-start")}>
                 <div className="chat-image avatar">
                     <div className="h-10 w-12 rounded-full">
@@ -105,7 +105,7 @@ export default function MessageBox({
                             user?.id === message.senderId && (
                                 <>
                                     <li>
-                                        <div>
+                                        <div onClick={handleEdit}>
                                             <FiEdit3/>
                                             <p>Edit</p>
                                         </div>

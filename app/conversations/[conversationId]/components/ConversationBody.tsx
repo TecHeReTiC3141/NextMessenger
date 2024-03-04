@@ -16,6 +16,7 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
 
     const [ messages, setMessages ] = useState(initialMessages);
     const [ messageWithActionMenu, setMessageWithActionMenu ] = useState<string>("");
+    const [ editedMessage, setEditedMessage ] = useState<FullMessage | null>(null);
 
     const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +78,8 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
             {messages.map((message, index) => (
                 <MessageBox message={message} isLast={index === messages.length - 1} key={message.id}
                             messageWithActionMenu={messageWithActionMenu}
-                            setMessageWithActionMenu={setMessageWithActionMenu}/>
+                            setMessageWithActionMenu={setMessageWithActionMenu}
+                />
             ))}
             <div ref={bottomRef} className="pt-24"/>
         </div>
