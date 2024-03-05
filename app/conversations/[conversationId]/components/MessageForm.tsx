@@ -7,7 +7,7 @@ import { AddMessageFormSchema } from "@/app/lib/schema";
 import { z } from "zod";
 import { MdPhoto } from "react-icons/md";
 import { HiPaperAirplane } from "react-icons/hi2";
-import { handleNewMessage } from "@/app/conversations/[conversationId]/actions";
+import { handleMessageFormSubmit } from "@/app/conversations/[conversationId]/actions";
 import toast from "react-hot-toast";
 import { CldUploadButton } from "next-cloudinary";
 import Image from "next/image";
@@ -23,7 +23,7 @@ interface AddNewMessageFormProps {
     editedMessage: Message | null
 }
 
-export default function AddNewMessageForm({ editedMessage }: AddNewMessageFormProps) {
+export default function MessageForm({ editedMessage }: AddNewMessageFormProps) {
 
     const { conversationId } = useConversation();
 
@@ -62,10 +62,13 @@ export default function AddNewMessageForm({ editedMessage }: AddNewMessageFormPr
 
     const onSubmit: SubmitHandler<formFields> = async (data) => {
         console.log(data);
-        const res = await handleNewMessage(data as unknown as FormData);
+        const res = await handleMessageFormSubmit(data as unknown as FormData, editedMessage?.id);
         if (!res) {
             toast.error("Something went wrong while sending your message. Please try again later");
             return;
+        }
+        if (editedMessage) {
+            handleCloseEdit();
         }
         reset();
     }
@@ -87,7 +90,7 @@ export default function AddNewMessageForm({ editedMessage }: AddNewMessageFormPr
 
             {editedMessage && (
                 <div
-                    className="absolute w-full bottom-full left-0 px-2 py-1 bg-base-300 flex justify-between items-center">
+                    className="absolute w-full bottom-full left-0 px-2 py-1 bg-base-300 flex justify-between items-center z-10">
                     <div>
                         <p className="text-sm text-sky-500">Editing...</p>
                         {editedMessage.body}
@@ -114,8 +117,8 @@ export default function AddNewMessageForm({ editedMessage }: AddNewMessageFormPr
                 </CldUploadButton>
                 <input type="hidden" value={conversationId} {...register("conversationId")}/>
                 <input type="text" className="hidden" {...register("image")}/>
-                <input type="text" className="flex-1 input input-sm focus:outline-none rounded-full bg-base-200"
-                       placeholder="Write a message..." {...register("message")} />
+                <input type="text" className="flex-1 input input-sm focus:outline-none rounded-full bg-base-200" id="message-form-body"
+                       placeholder="Write a message..." {...register("message")} autoFocus={editedMessage !== null} />
                 <button disabled={watchMessage?.length == 0 && watchImage?.length == 0}
                         className="btn btn-circle btn-sm hover:shadow-md btn-primary">
                     <HiPaperAirplane/>

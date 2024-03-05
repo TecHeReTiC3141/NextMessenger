@@ -2,7 +2,7 @@
 
 import prisma from "@/app/lib/db/prisma";
 import { ConversationInList } from "@/app/lib/db/conversation";
-import { createNewMessage, FullMessage } from "@/app/lib/db/message";
+import { createNewMessage, FullMessage, updateMessage } from "@/app/lib/db/message";
 import { AddMessageFormSchema } from "@/app/lib/schema";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
@@ -30,11 +30,15 @@ export default async function getConversationById(conversationId: string): Promi
     });
 }
 
-export async function handleNewMessage(formData: FormData): Promise<boolean> {
+export async function handleMessageFormSubmit(formData: FormData, editedId?: string): Promise<boolean> {
     const res = AddMessageFormSchema.safeParse(formData);
     if (res.success) {
         const { data: { message, image, conversationId } } = res;
-        await createNewMessage({ body: message, image, conversationId });
+        if (!editedId) {
+            await createNewMessage({ body: message, image, conversationId });
+        } else {
+            await updateMessage({ body: message, image, conversationId, messageId: editedId }, );
+        }
     }
     return res.success;
 }
@@ -92,7 +96,7 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
 
     await getPusherInstance().trigger(currentUser.email as string, "conversation:update", {
         id: conversationId,
-        messages: [updatedMessage],
+        messages: [ updatedMessage ],
         lastMessageAt: curConversation.lastMessageAt,
     });
 

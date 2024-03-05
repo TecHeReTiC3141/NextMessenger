@@ -2,7 +2,7 @@ import getConversationById, { getEditedMessage } from "@/app/conversations/[conv
 import { redirect } from "next/navigation";
 import ConversationHeader from "@/app/conversations/[conversationId]/components/ConversationHeader";
 import ConversationBody from "@/app/conversations/[conversationId]/components/ConversationBody";
-import AddNewMessageForm from "@/app/conversations/[conversationId]/components/AddNewMessageForm";
+import MessageForm from "@/app/conversations/[conversationId]/components/MessageForm";
 
 interface ConversationPageProps {
     params: {
@@ -29,7 +29,7 @@ export default async function ConversationPage({ params: { conversationId }, sea
             <div className="h-full flex flex-col">
                 <ConversationHeader conversation={conversation}/>
                 <ConversationBody initialMessages={conversation.messages}/>
-                <AddNewMessageForm editedMessage={editedMessage}/>
+                <MessageForm editedMessage={editedMessage}/>
             </div>
         </div>
     )

@@ -7,7 +7,7 @@ import { Message, User } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { getPusherInstance } from "@/app/lib/pusher";
 
-interface CreateMessageData {
+type CreateMessageData = {
     body?: string,
     image?: string,
     conversationId: string,
@@ -71,6 +71,46 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
     })
     revalidatePath("/conversations/[conversationId]", "page");
     return newMessage;
+}
+
+type UpdateMessageData = CreateMessageData & { messageId: string };
+
+export async function updateMessage({ body, image, conversationId, messageId }: UpdateMessageData,) {
+
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const messageToUpdate = await prisma.message.findUnique({
+        where: {
+            id: messageId,
+            senderId: session.user.id,
+        },
+        select: {
+            body: true,
+            image: true,
+        }
+    });
+    if (messageToUpdate === null) {
+        throw new Error("Invalid ID")
+    }
+    const updatedMessage = await prisma.message.update({
+        where: {
+            id: messageId,
+        },
+        data: {
+            body: body || messageToUpdate.body,
+            image: image || messageToUpdate.image,
+            createdAt: new Date(),
+            isEdited: true,
+        },
+        include: {
+            sender: true,
+            seen: true,
+        }
+    });
+    await getPusherInstance().trigger(updatedMessage.conversationId as string, "message:update", updatedMessage);
 }
 
 export async function deleteMessageById(messageId: string) {

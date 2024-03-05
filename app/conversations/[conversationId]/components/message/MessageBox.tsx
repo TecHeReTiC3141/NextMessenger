@@ -51,6 +51,10 @@ export default function MessageBox({
     function handleEdit() {
         const searchParamsWithEdited = new URLSearchParams({ 'edited': message.id });
         replace(`${pathname}?${searchParamsWithEdited.toString()}`);
+        const input = document.querySelector("#message-form-body") as HTMLInputElement;
+        if (input) {
+            input.focus();
+        }
     }
 
     return (
@@ -84,11 +88,12 @@ export default function MessageBox({
                             </>
                     }
                 </div>
-                {isOwnMessage && isLast && seenList.length > 0 && (
-                    <div className="chat-footer text-xs">
+                <div className="chat-footer text-xs">
+                    {isOwnMessage && isLast && seenList.length > 0 &&
                         <p>Seen by {seenList}</p>
-                    </div>
-                )}
+                    }
+                    {message.isEdited && <p className="font-light">Edited</p>}
+                </div>
 
             </div>
             {
