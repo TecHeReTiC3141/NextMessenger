@@ -80,7 +80,7 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
             }
         }
 
-        function deleteLastMessageFromConversationHandler(updatedConversation: { id: string, messages: FullMessage[] }) {
+        function setMessagesHandler(updatedConversation: { id: string, messages: FullMessage[] }) {
             setItems(prev =>
 
                 prev.map(conversation => {
@@ -98,14 +98,14 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
         pusherClient.bind("conversation:new", newConversationHandler);
         pusherClient.bind("conversation:update", updateConversationHandler);
         pusherClient.bind("conversation:remove", removeConversationHandler);
-        pusherClient.bind("conversation:deleteLastMessage", deleteLastMessageFromConversationHandler);
+        pusherClient.bind("conversation:setMessages", setMessagesHandler);
 
         return () => {
             pusherClient.unsubscribe(pusherKey);
             pusherClient.unbind("conversation:new", newConversationHandler);
             pusherClient.unbind("conversation:update", updateConversationHandler);
             pusherClient.unbind("conversation:remove", removeConversationHandler);
-            pusherClient.unbind("conversation:deleteLastMessage", deleteLastMessageFromConversationHandler);
+            pusherClient.unbind("conversation:setMessages", setMessagesHandler);
         }
     }, [ conversationId, pusherKey, router ]);
 

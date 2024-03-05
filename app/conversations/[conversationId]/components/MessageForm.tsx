@@ -62,9 +62,10 @@ export default function MessageForm({ editedMessage }: AddNewMessageFormProps) {
 
     const onSubmit: SubmitHandler<formFields> = async (data) => {
         console.log(data);
-        const res = await handleMessageFormSubmit(data as unknown as FormData, editedMessage?.id);
-        if (!res) {
-            toast.error("Something went wrong while sending your message. Please try again later");
+        try {
+            await handleMessageFormSubmit(data as unknown as FormData, editedMessage?.id);
+        } catch (err: any) {
+            toast.error(`Something went wrong while sending your message: ${err}`);
             return;
         }
         if (editedMessage) {

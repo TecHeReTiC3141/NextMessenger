@@ -75,7 +75,7 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
 
 type UpdateMessageData = CreateMessageData & { messageId: string };
 
-export async function updateMessage({ body, image, conversationId, messageId }: UpdateMessageData,) {
+export async function updateMessage({ body, image, messageId }: UpdateMessageData,) {
 
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
@@ -88,8 +88,7 @@ export async function updateMessage({ body, image, conversationId, messageId }: 
             senderId: session.user.id,
         },
         select: {
-            body: true,
-            image: true,
+            createdAt: true,
         }
     });
     if (messageToUpdate === null) {
@@ -100,8 +99,8 @@ export async function updateMessage({ body, image, conversationId, messageId }: 
             id: messageId,
         },
         data: {
-            body: body || messageToUpdate.body,
-            image: image || messageToUpdate.image,
+            body: body,
+            image: image,
             createdAt: new Date(),
             isEdited: true,
         },
@@ -110,7 +109,53 @@ export async function updateMessage({ body, image, conversationId, messageId }: 
             seen: true,
         }
     });
-    await getPusherInstance().trigger(updatedMessage.conversationId as string, "message:update", updatedMessage);
+    if (!updatedMessage.conversationId) return;
+    await getPusherInstance().trigger(updatedMessage.conversationId, "message:update", updatedMessage);
+    revalidatePath("/conversations/[conversationId]", "page");
+    const updatedConversation = await prisma.conversation.findUnique({
+        where: {
+            id: updatedMessage.conversationId,
+        },
+        include: {
+            users: {
+                select: {
+                    email: true,
+                }
+            },
+            messages: {
+                select: {
+                    id: true,
+                    createdAt: true,
+                },
+                orderBy: {
+                    createdAt: "asc",
+                }
+            }
+        },
+    });
+    if (!updatedConversation) {
+        return;
+    }
+
+    console.log("In update messages", updatedConversation?.messages, updatedMessage.createdAt, updatedConversation?.lastMessageAt);
+    if (updatedConversation && messageToUpdate.createdAt.getTime() === updatedConversation.lastMessageAt.getTime()) {
+        const newUpdatedConversation = await prisma.conversation.update({
+            where: {
+                id: updatedConversation.id,
+            },
+            data: {
+                lastMessageAt: updatedMessage.createdAt,
+            },
+            select: {
+                id: true,
+                messages: true,
+            }
+        });
+        updatedConversation.users.map(async user => {
+            await getPusherInstance().trigger(user.email as string, "conversation:setMessages",
+                { id: updatedConversation.id, messages: newUpdatedConversation.messages });
+        });
+    }
 }
 
 export async function deleteMessageById(messageId: string) {
@@ -130,6 +175,7 @@ export async function deleteMessageById(messageId: string) {
     if (deletedMessage === null) {
         throw new Error("Couldn't find your message or it's not yours");
     }
+
     if (!deletedMessage.conversationId) return;
     await getPusherInstance().trigger(deletedMessage.conversationId, "message:delete", { id: messageId });
     const updatedConversation = await prisma.conversation.findUnique({
@@ -174,10 +220,11 @@ export async function deleteMessageById(messageId: string) {
                 }
             });
             updatedConversation.users.map(async user => {
-                await getPusherInstance().trigger(user.email as string, "conversation:deleteLastMessage",
+                await getPusherInstance().trigger(user.email as string, "conversation:setMessages",
                     { id: updatedConversation.id, messages: newUpdatedConversation.messages });
             });
         }
     }
+    revalidatePath("/conversations/[conversationId]", "page");
 }
 
