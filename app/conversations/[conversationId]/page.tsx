@@ -1,4 +1,7 @@
-import getConversationById, { getEditedMessage } from "@/app/conversations/[conversationId]/actions";
+import getConversationById, {
+    getAnsweredMessage,
+    getEditedMessage
+} from "@/app/conversations/[conversationId]/actions";
 import { redirect } from "next/navigation";
 import ConversationHeader from "@/app/conversations/[conversationId]/components/ConversationHeader";
 import ConversationBody from "@/app/conversations/[conversationId]/components/ConversationBody";
@@ -10,10 +13,11 @@ interface ConversationPageProps {
     },
     searchParams: {
         edited?: string,
+        answering?: string,
     }
 }
 
-export default async function ConversationPage({ params: { conversationId }, searchParams: {edited} }: ConversationPageProps) {
+export default async function ConversationPage({ params: { conversationId }, searchParams: {edited, answering} }: ConversationPageProps) {
 
     const conversation = await getConversationById(conversationId);
 
@@ -21,15 +25,15 @@ export default async function ConversationPage({ params: { conversationId }, sea
         return redirect("/404");
     }
 
-    let editedMessage = edited ?  await getEditedMessage(edited) : null;
-
+    const editedMessage = edited ?  await getEditedMessage(edited) : null;
+    const answeredMessage = answering ?  await getAnsweredMessage(answering) : null;
 
     return (
         <div className="lg:pl-80 h-full max-h-full">
             <div className="h-full flex flex-col">
                 <ConversationHeader conversation={conversation}/>
                 <ConversationBody initialMessages={conversation.messages}/>
-                <MessageForm editedMessage={editedMessage}/>
+                <MessageForm editedMessage={editedMessage} answeringMessage={answeredMessage}/>
             </div>
         </div>
     )

@@ -57,6 +57,15 @@ export default function MessageBox({
         }
     }
 
+    function handleAnswer() {
+        const searchParamsWithAnswering = new URLSearchParams({ 'answering': message.id });
+        replace(`${pathname}?${searchParamsWithAnswering.toString()}`);
+        const input = document.querySelector("#message-form-body") as HTMLInputElement;
+        if (input) {
+            input.focus();
+        }
+    }
+
     return (
         <>
             <ConfirmMessageDeleteModal message={message}/>
@@ -101,7 +110,7 @@ export default function MessageBox({
                     <ul className="menu bg-base-200 w-56 rounded-box absolute z-[1] -translate-x-[100%] border-neutral border"
                         style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}>
                         <li>
-                            <div>
+                            <div onClick={handleAnswer}>
                                 <IoArrowUndoOutline/>
                                 <p>Answer</p>
                             </div>

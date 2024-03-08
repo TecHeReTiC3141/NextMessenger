@@ -2,7 +2,7 @@
 
 import prisma from "@/app/lib/db/prisma";
 import { ConversationInList } from "@/app/lib/db/conversation";
-import { createNewMessage, FullMessage, updateMessage } from "@/app/lib/db/message";
+import { createNewMessage, FullMessage, MessageWithSender, updateMessage } from "@/app/lib/db/message";
 import { AddMessageFormSchema } from "@/app/lib/schema";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
@@ -30,12 +30,12 @@ export default async function getConversationById(conversationId: string): Promi
     });
 }
 
-export async function handleMessageFormSubmit(formData: FormData, editedId?: string): Promise<boolean> {
+export async function handleMessageFormSubmit(formData: FormData, editedId?: string, answeringId?: string): Promise<boolean> {
     const res = AddMessageFormSchema.safeParse(formData);
     if (res.success) {
         const { data: { message, image, conversationId } } = res;
         if (!editedId) {
-            await createNewMessage({ body: message, image, conversationId });
+            await createNewMessage({ body: message, image, conversationId, answeringId });
         } else {
             await updateMessage({ body: message, image, conversationId, messageId: editedId }, );
         }
@@ -109,6 +109,17 @@ export async function getEditedMessage(editedId: string): Promise<Message | null
     return prisma.message.findUnique({
         where: {
             id: editedId,
+        }
+    });
+}
+
+export async function getAnsweredMessage(answeredId : string): Promise<MessageWithSender | null> {
+    return prisma.message.findUnique({
+        where: {
+            id: answeredId,
+        },
+        include: {
+            sender: true,
         }
     });
 }

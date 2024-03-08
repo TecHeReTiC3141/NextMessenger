@@ -15,15 +15,19 @@ import { FaXmark } from "react-icons/fa6";
 import { Message } from ".prisma/client";
 import React, { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FiEdit3 } from "react-icons/fi";
+import { MessageWithSender } from "@/app/lib/db/message";
+import { IoArrowUndoOutline } from "react-icons/io5";
 
 
 type formFields = z.infer<typeof AddMessageFormSchema>;
 
 interface AddNewMessageFormProps {
-    editedMessage: Message | null
+    editedMessage: Message | null,
+    answeringMessage: MessageWithSender | null
 }
 
-export default function MessageForm({ editedMessage }: AddNewMessageFormProps) {
+export default function MessageForm({ editedMessage, answeringMessage }: AddNewMessageFormProps) {
 
     const { conversationId } = useConversation();
 
@@ -63,12 +67,12 @@ export default function MessageForm({ editedMessage }: AddNewMessageFormProps) {
     const onSubmit: SubmitHandler<formFields> = async (data) => {
         console.log(data);
         try {
-            await handleMessageFormSubmit(data as unknown as FormData, editedMessage?.id);
+            await handleMessageFormSubmit(data as unknown as FormData, editedMessage?.id, answeringMessage?.id);
         } catch (err: any) {
             toast.error(`Something went wrong while sending your message: ${err}`);
             return;
         }
-        if (editedMessage) {
+        if (editedMessage || answeringMessage) {
             handleCloseEdit();
         }
         reset();
@@ -81,6 +85,7 @@ export default function MessageForm({ editedMessage }: AddNewMessageFormProps) {
     function handleCloseEdit() {
         const searchParamsWithoutEdit = new URLSearchParams(searchParams);
         searchParamsWithoutEdit.delete("edited");
+        searchParamsWithoutEdit.delete("answering");
         replace(`${pathname}?${searchParamsWithoutEdit.toString()}`);
         setValue("message", "");
         setValue("image", "");
@@ -91,13 +96,25 @@ export default function MessageForm({ editedMessage }: AddNewMessageFormProps) {
 
             {editedMessage && (
                 <div
-                    className="absolute w-full bottom-full left-0 px-2 py-1 bg-base-300 flex justify-between items-center z-10">
-                    <div>
+                    className="absolute w-full bottom-full left-0 px-2 py-1 bg-base-300 flex items-center z-10 gap-3">
+                    <FiEdit3 className="text-sky-500" size={24}/>
+                    <div className="flex-1">
                         <p className="text-sm text-sky-500">Editing...</p>
                         {editedMessage.body}
                     </div>
                     <button className="btn btn-sm btn-circle btn-ghost" onClick={handleCloseEdit}>✕</button>
 
+                </div>
+            )}
+            {answeringMessage && (
+                <div
+                    className="absolute w-full bottom-full left-0 px-2 py-1 bg-base-300 flex items-center z-10 gap-3">
+                    <IoArrowUndoOutline className="text-sky-500" size={24}/>
+                    <div className="flex-1">
+                        <p className="text-sm text-sky-500">Answering <span className="font-bold">{answeringMessage.sender?.name || ""}</span></p>
+                        {answeringMessage.body}
+                    </div>
+                    <button className="btn btn-sm btn-circle btn-ghost" onClick={handleCloseEdit}>✕</button>
                 </div>
             )}
 

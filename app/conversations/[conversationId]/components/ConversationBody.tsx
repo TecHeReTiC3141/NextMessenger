@@ -16,7 +16,6 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
 
     const [ messages, setMessages ] = useState(initialMessages);
     const [ messageWithActionMenu, setMessageWithActionMenu ] = useState<string>("");
-    const [ editedMessage, setEditedMessage ] = useState<FullMessage | null>(null);
 
     const bottomRef = useRef<HTMLDivElement>(null);
 

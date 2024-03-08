@@ -3,7 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
-import { Message, User } from "@prisma/client";
+import { Message } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { getPusherInstance } from "@/app/lib/pusher";
 
@@ -11,45 +11,118 @@ type CreateMessageData = {
     body?: string,
     image?: string,
     conversationId: string,
+    answeringId?: string,
 }
 
-export type MessageWithSeen = Message & { seen: User[] };
-export type MessageWithSender = Message & { sender: User | null };
-export type FullMessage = MessageWithSender & MessageWithSeen;
+export type MessageSender = {id: string, name: string | null, image: string | null} | null
+export type MessageWithSeen = Message & { seen: { id: string, name: string | null }[] };
+export type MessageWithSender = Message & { sender: MessageSender };
+export type MessageWithAnsweringMessage = Message & {
+    answeredMessage?: {
+        body?: string | null,
+        image?: string | null,
+        sender: MessageSender,
+    } | null,
+};
+export type FullMessage = MessageWithSender & MessageWithSeen & MessageWithAnsweringMessage;
 
-export async function createNewMessage({ body, image, conversationId }: CreateMessageData): Promise<FullMessage> {
+export async function createNewMessage({
+                                           body,
+                                           image,
+                                           conversationId,
+                                           answeringId
+                                       }: CreateMessageData): Promise<FullMessage> {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
         throw new Error("Unauthorized");
     }
 
-    const newMessage = await prisma.message.create({
-        data: {
-            body,
-            image,
-            conversation: {
-                connect: { id: conversationId },
+    let newMessage: FullMessage;
+
+    if (answeringId) {
+        newMessage = await prisma.message.create({
+            data: {
+                body,
+                image,
+                conversation: {
+                    connect: { id: conversationId },
+                },
+                sender: {
+                    connect: { id: session.user.id },
+                },
+                seen: {
+                    connect: { id: session.user.id },
+                },
+                answeredMessage: {
+                    connect: {
+                        id: answeringId,
+                    }
+                }
             },
-            sender: {
-                connect: { id: session.user.id },
-            },
-            seen: {
-                connect: { id: session.user.id },
+            include: {
+                seen: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    }
+                },
+                answeredMessage: {
+                    select: {
+                        body: true,
+                        image: true,
+                        sender: true,
+                    }
+                }
             }
-        },
-        include: {
-            seen: true,
-            sender: true,
-        }
-    });
+        });
+    } else {
+
+        newMessage = await prisma.message.create({
+            data: {
+                body,
+                image,
+                conversation: {
+                    connect: { id: conversationId },
+                },
+                sender: {
+                    connect: { id: session.user.id },
+                },
+                seen: {
+                    connect: { id: session.user.id },
+                }
+            },
+            include: {
+                seen: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    }
+                },
+            }
+        });
+    }
 
     const updatedConversation = await prisma.conversation.update({
         where: {
             id: conversationId,
         },
         data: {
-            lastMessageAt: newMessage.createdAt
+            lastMessageAt: newMessage.createdAt,
         },
         include: {
             users: true,
@@ -60,6 +133,7 @@ export async function createNewMessage({ body, image, conversationId }: CreateMe
             }
         }
     });
+    console.log(newMessage);
 
     await getPusherInstance().trigger(conversationId, "message:new", newMessage);
 
@@ -105,8 +179,26 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
             isEdited: true,
         },
         include: {
-            sender: true,
-            seen: true,
+            seen: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            },
+            sender: {
+                select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                }
+            },
+            answeredMessage: {
+                select: {
+                    body: true,
+                    image: true,
+                    sender: true,
+                }
+            }
         }
     });
     if (!updatedMessage.conversationId) return;
@@ -203,7 +295,6 @@ export async function deleteMessageById(messageId: string) {
         return;
     }
 
-    console.log(updatedConversation?.messages, deletedMessage.createdAt, updatedConversation?.lastMessageAt);
     if (updatedConversation && deletedMessage.createdAt.getTime() === updatedConversation.lastMessageAt.getTime()) {
         const lastMessage = updatedConversation.messages.at(-1);
         if (lastMessage) {
