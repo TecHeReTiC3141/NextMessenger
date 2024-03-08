@@ -135,6 +135,7 @@ export async function getUserConversations(): Promise<ConversationInList[]> {
                             id: true,
                             name: true,
                             image: true,
+                            email: true,
                         }
                     },
                     answeredMessage: {

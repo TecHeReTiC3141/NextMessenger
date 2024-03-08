@@ -14,7 +14,7 @@ type CreateMessageData = {
     answeringId?: string,
 }
 
-export type MessageSender = {id: string, name: string | null, image: string | null} | null
+export type MessageSender = {id: string, name: string | null, image: string | null, email: string | null}  | null
 export type MessageWithSeen = Message & { seen: { id: string, name: string | null }[] };
 export type MessageWithSender = Message & { sender: MessageSender };
 export type MessageWithAnsweringMessage = Message & {
@@ -73,6 +73,7 @@ export async function createNewMessage({
                         id: true,
                         name: true,
                         image: true,
+                        email: true,
                     }
                 },
                 answeredMessage: {
@@ -113,6 +114,7 @@ export async function createNewMessage({
                         id: true,
                         name: true,
                         image: true,
+                        email: true,
                     }
                 },
             }
@@ -179,6 +181,7 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
                     id: true,
                     name: true,
                     image: true,
+                    email: true,
                 }
             },
             answeredMessage: {

@@ -30,6 +30,7 @@ export default async function getConversationById(conversationId: string): Promi
                             id: true,
                             name: true,
                             image: true,
+                            email: true,
                         }
                     },
                     answeredMessage: {
