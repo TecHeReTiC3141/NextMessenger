@@ -104,8 +104,27 @@ export type ConversationWithMessages = Prisma.ConversationGetPayload<{
     include: {
         messages: {
             include: {
-                sender: true,
-                seen: true,
+                seen: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    }
+                },
+                answeredMessage: {
+                    select: {
+                        id: true,
+                        body: true,
+                        image: true,
+                        sender: true,
+                    }
+                }
             }
         }
     }
@@ -130,8 +149,27 @@ export async function getUserConversations(): Promise<ConversationInList[]> {
             users: true,
             messages: {
                 include: {
-                    sender: true,
-                    seen: true,
+                    seen: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    },
+                    sender: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                        }
+                    },
+                    answeredMessage: {
+                        select: {
+                            id: true,
+                            body: true,
+                            image: true,
+                            sender: true,
+                        }
+                    }
                 }
             }
         }
@@ -153,7 +191,11 @@ export async function deleteConversationById(conversationId: string) {
             id: conversationId,
         },
         include: {
-            users: true,
+            users: {
+                select: {
+                    email: true,
+                }
+            },
         }
     });
 

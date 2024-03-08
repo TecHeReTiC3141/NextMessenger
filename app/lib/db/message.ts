@@ -19,6 +19,7 @@ export type MessageWithSeen = Message & { seen: { id: string, name: string | nul
 export type MessageWithSender = Message & { sender: MessageSender };
 export type MessageWithAnsweringMessage = Message & {
     answeredMessage?: {
+        id: string,
         body?: string | null,
         image?: string | null,
         sender: MessageSender,
@@ -76,6 +77,7 @@ export async function createNewMessage({
                 },
                 answeredMessage: {
                     select: {
+                        id: true,
                         body: true,
                         image: true,
                         sender: true,
@@ -194,6 +196,7 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
             },
             answeredMessage: {
                 select: {
+                    id: true,
                     body: true,
                     image: true,
                     sender: true,
@@ -257,17 +260,40 @@ export async function deleteMessageById(messageId: string) {
         throw new Error("Unauthorized");
     }
 
-    const deletedMessage = await prisma.message.delete({
+    const deletedMessage = await prisma.message.findUnique({
         where: {
             id: messageId,
             senderId: session.user.id,
+        },
+        include: {
+            answers: {
+                select: {
+                    id: true,
+                }
+            }
         }
     });
 
     if (deletedMessage === null) {
         throw new Error("Couldn't find your message or it's not yours");
     }
-
+    deletedMessage.answers.map(async ({id}) => {
+        await prisma.message.update({
+            where: {
+                id,
+            },
+            data: {
+                answeredMessage: {
+                    disconnect: true,
+                },
+            }
+        })
+    });
+    await prisma.message.delete({
+        where: {
+            id: deletedMessage.id,
+        }
+    })
     if (!deletedMessage.conversationId) return;
     await getPusherInstance().trigger(deletedMessage.conversationId, "message:delete", { id: messageId });
     const updatedConversation = await prisma.conversation.findUnique({

@@ -86,9 +86,9 @@ model Message {
     senderId          String?       @db.ObjectId
     seenIds           String[]      @db.ObjectId
     seen              User[]        @relation("Seen", fields: [seenIds], references: [id])
+    answeredMessageId String?       @db.ObjectId
     answeredMessage   Message?      @relation("MessageAnswers", fields: [answeredMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
     answers           Message[]     @relation("MessageAnswers")
-    answeredMessageId String?       @db.ObjectId
 
     @@map("messages")
 }

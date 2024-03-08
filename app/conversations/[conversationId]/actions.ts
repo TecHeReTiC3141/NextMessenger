@@ -19,8 +19,27 @@ export default async function getConversationById(conversationId: string): Promi
             users: true,
             messages: {
                 include: {
-                    seen: true,
-                    sender: true,
+                    seen: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    },
+                    sender: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                        }
+                    },
+                    answeredMessage: {
+                        select: {
+                            id: true,
+                            body: true,
+                            image: true,
+                            sender: true,
+                        }
+                    }
                 },
                 orderBy: {
                     createdAt: 'asc',
@@ -37,7 +56,7 @@ export async function handleMessageFormSubmit(formData: FormData, editedId?: str
         if (!editedId) {
             await createNewMessage({ body: message, image, conversationId, answeringId });
         } else {
-            await updateMessage({ body: message, image, conversationId, messageId: editedId }, );
+            await updateMessage({ body: message, image, conversationId, messageId: editedId },);
         }
     }
     return res.success;
@@ -60,7 +79,11 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
             messages: {
                 select: {
                     id: true,
-                    seen: true,
+                    seen: {
+                        select: {
+                            id: true,
+                        }
+                    },
                 }
             },
             users: true,
@@ -113,7 +136,7 @@ export async function getEditedMessage(editedId: string): Promise<Message | null
     });
 }
 
-export async function getAnsweredMessage(answeredId : string): Promise<MessageWithSender | null> {
+export async function getAnsweredMessage(answeredId: string): Promise<MessageWithSender | null> {
     return prisma.message.findUnique({
         where: {
             id: answeredId,

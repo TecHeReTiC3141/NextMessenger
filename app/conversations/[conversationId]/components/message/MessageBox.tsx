@@ -13,6 +13,7 @@ import ConfirmMessageDeleteModal
     from "@/app/conversations/[conversationId]/components/message/ConfirmMessageDeleteModal";
 import { openModal } from "@/app/components/Modal";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 interface MessageBoxProps {
     message: FullMessage,
@@ -66,10 +67,20 @@ export default function MessageBox({
         }
     }
 
+    function goToAnswer() {
+        const answer = document.querySelector(`#message-${message.answeredMessage?.id}`) as HTMLDialogElement;
+        console.log(answer, `#message-${message.answeredMessage?.id}`);
+        if (answer) {
+            answer.scrollIntoView(true);
+        }
+    }
+
+    console.log(message.body, message.answeredMessage);
+
     return (
         <>
             <ConfirmMessageDeleteModal message={message}/>
-            <div className={clsx("chat", isOwnMessage ? "chat-end" : "chat-start")}>
+            <div className={clsx("chat", isOwnMessage ? "chat-end" : "chat-start")} id={`message-${message.id}`}>
                 <div className="chat-image avatar">
                     <div className="h-10 w-12 rounded-full">
                         <UserAvatar user={message.sender as User} height={40} width={40}/>
@@ -87,6 +98,23 @@ export default function MessageBox({
                 }}
                      className={clsx(message.body && "chat-bubble", !message.body ? "bg-transparent" :
                          (isOwnMessage ? "bg-primary" : "bg-base-300 text-base-content flex-col gap-3"))}>
+                    {message.answeredMessage && (
+                        <div
+                            className="rounded-md bg-base-100 bg-opacity-50 hover:bg-opacity-65 transition duration-200 border-l-4
+                                border-sky-400 px-2 py-1 cursor-pointer select-none flex items-center gap-2"
+                            onClick={goToAnswer}>
+                            {message.answeredMessage.image && ( 
+                                <Image src={message.answeredMessage.image} alt="Answer image" width={280} height={280}
+                                       className="rounded-md object-cover w-10 h-10" />
+                            )}
+                            <div>
+                                <span className="font-bold text-xs text-sky-700">
+                                    {message.answeredMessage.sender?.name}
+                                </span>
+                                    <p className="text-primary text-sm">{message.answeredMessage.body}</p>
+                            </div>
+                        </div>
+                    )}
                     {
                         message.image && !message.body ?
                             <MessageImage image={message.image}/>

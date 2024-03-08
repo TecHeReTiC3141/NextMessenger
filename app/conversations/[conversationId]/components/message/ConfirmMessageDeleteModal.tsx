@@ -13,7 +13,7 @@ export default function ConfirmMessageDeleteModal({ message }: ConfirmMessageDel
         try {
             await deleteMessageById(message.id);
         } catch (err: any) {
-            toast.error("Something went wrong while deleting this conversation")
+            toast.error("Something went wrong while deleting this message")
         }
     }
 
