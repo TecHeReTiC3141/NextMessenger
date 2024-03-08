@@ -70,7 +70,7 @@ export default function ConversationBody({ initialMessages }: ConversationBodyPr
     }, [ conversationId ]);
 
     return (
-        <div className="flex-1 bg-base-200 px-2 overflow-y-auto py-1 rounded"
+        <div className="flex-1 overflow-y-auto py-1 rounded bg-white"
              onClick={() => setMessageWithActionMenu("")}
              onScroll={() => setMessageWithActionMenu("")}
             >

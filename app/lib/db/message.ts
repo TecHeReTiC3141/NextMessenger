@@ -158,18 +158,6 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
         throw new Error("Unauthorized");
     }
 
-    const messageToUpdate = await prisma.message.findUnique({
-        where: {
-            id: messageId,
-            senderId: session.user.id,
-        },
-        select: {
-            createdAt: true,
-        }
-    });
-    if (messageToUpdate === null) {
-        throw new Error("Invalid ID")
-    }
     const updatedMessage = await prisma.message.update({
         where: {
             id: messageId,
@@ -177,7 +165,6 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
         data: {
             body: body,
             image: image,
-            createdAt: new Date(),
             isEdited: true,
         },
         include: {
@@ -204,6 +191,9 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
             }
         }
     });
+    if (updatedMessage === null) {
+        throw new Error("Invalid ID")
+    }
     if (!updatedMessage.conversationId) return;
     await getPusherInstance().trigger(updatedMessage.conversationId, "message:update", updatedMessage);
     revalidatePath("/conversations/[conversationId]", "page");
@@ -218,9 +208,28 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
                 }
             },
             messages: {
-                select: {
-                    id: true,
-                    createdAt: true,
+                include: {
+                    seen: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    },
+                    sender: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                        }
+                    },
+                    answeredMessage: {
+                        select: {
+                            id: true,
+                            body: true,
+                            image: true,
+                            sender: true,
+                        }
+                    }
                 },
                 orderBy: {
                     createdAt: "asc",
@@ -233,22 +242,10 @@ export async function updateMessage({ body, image, messageId }: UpdateMessageDat
     }
 
     console.log("In update messages", updatedConversation?.messages, updatedMessage.createdAt, updatedConversation?.lastMessageAt);
-    if (updatedConversation && messageToUpdate.createdAt.getTime() === updatedConversation.lastMessageAt.getTime()) {
-        const newUpdatedConversation = await prisma.conversation.update({
-            where: {
-                id: updatedConversation.id,
-            },
-            data: {
-                lastMessageAt: updatedMessage.createdAt,
-            },
-            select: {
-                id: true,
-                messages: true,
-            }
-        });
+    if (updatedMessage.createdAt.getTime() === updatedConversation.lastMessageAt.getTime()) {
         updatedConversation.users.map(async user => {
             await getPusherInstance().trigger(user.email as string, "conversation:setMessages",
-                { id: updatedConversation.id, messages: newUpdatedConversation.messages });
+                { id: updatedConversation.id, messages: updatedConversation.messages });
         });
     }
 }

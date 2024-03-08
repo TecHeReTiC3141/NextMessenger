@@ -32,6 +32,7 @@ export default async function ConversationPage({ params: { conversationId }, sea
         <div className="lg:pl-80 h-full max-h-full">
             <div className="h-full flex flex-col">
                 <ConversationHeader conversation={conversation}/>
+
                 <ConversationBody initialMessages={conversation.messages}/>
                 <MessageForm editedMessage={editedMessage} answeringMessage={answeredMessage}/>
             </div>

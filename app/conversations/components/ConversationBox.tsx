@@ -17,20 +17,20 @@ export default function ConversationBox({ conversation, selected }: Conversation
 
     const session = useSession();
 
-    const userEmail = session?.data?.user?.email;
+    const userId = session?.data?.user?.id;
 
     const otherUser = useOtherUser(conversation);
 
     const lastMessage = (conversation.messages || []).at(-1);
 
     const seenLastMessage = useMemo(() => {
-        if (!userEmail || !lastMessage) {
+        if (!userId || !lastMessage) {
             return false;
         }
 
         const seen = lastMessage.seen || [];
-        return seen.filter(user => user.email === userEmail).length > 0;
-    }, [ lastMessage, userEmail ]);
+        return seen.filter(user => user.id === userId).length > 0;
+    }, [ lastMessage, userId ]);
 
     const lastMessageText = lastMessage ? (lastMessage?.image ? "Sent an image" : lastMessage?.body) : "Start a new chat";
 

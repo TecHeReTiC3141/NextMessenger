@@ -77,6 +77,7 @@ model Conversation {
 model Message {
     id                String        @id @default(auto()) @map("_id") @db.ObjectId
     createdAt         DateTime      @default(now())
+    updatedAt         DateTime      @updatedAt
     body              String?
     image             String?
     isEdited          Boolean       @default(false)

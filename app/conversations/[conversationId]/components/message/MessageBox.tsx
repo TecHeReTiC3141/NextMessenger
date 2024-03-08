@@ -84,7 +84,7 @@ export default function MessageBox({
     return (
         <>
             <ConfirmMessageDeleteModal message={message}/>
-            <div className={clsx("chat transition duration-300 bg-opacity-80 ease-linear bg-white", isOwnMessage ? "chat-end" : "chat-start")} id={`message-${message.id}`}>
+            <div className={clsx("chat transition duration-300 bg-opacity-80 ease-linear bg-white px-2", isOwnMessage ? "chat-end" : "chat-start")} id={`message-${message.id}`}>
                 <div className="chat-image avatar">
                     <div className="h-10 w-12 rounded-full">
                         <UserAvatar user={message.sender as User} height={40} width={40}/>
