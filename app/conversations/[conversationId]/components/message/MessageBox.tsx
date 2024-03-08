@@ -73,8 +73,10 @@ export default function MessageBox({
         if (answer) {
             answer.scrollIntoView(true);
             answer.classList.add("bg-sky-200");
+            answer.classList.remove("bg-white");
             setTimeout(() => {
                 answer.classList.remove("bg-sky-200");
+                answer.classList.add("bg-white");
             }, 1000);
         }
     }
@@ -84,7 +86,9 @@ export default function MessageBox({
     return (
         <>
             <ConfirmMessageDeleteModal message={message}/>
-            <div className={clsx("chat transition duration-300 bg-opacity-80 ease-linear bg-white px-2", isOwnMessage ? "chat-end" : "chat-start")} id={`message-${message.id}`}>
+            <div
+                className={clsx("chat transition duration-300 bg-opacity-80 ease-linear bg-white px-2", isOwnMessage ? "chat-end" : "chat-start")}
+                id={`message-${message.id}`}>
                 <div className="chat-image avatar">
                     <div className="h-10 w-12 rounded-full">
                         <UserAvatar user={message.sender as User} height={40} width={40}/>
@@ -107,15 +111,15 @@ export default function MessageBox({
                             className="rounded-md bg-base-100 bg-opacity-50 hover:bg-opacity-65 transition duration-200 border-l-4
                                 border-sky-400 px-2 py-1 cursor-pointer select-none flex items-center gap-2"
                             onClick={goToAnswer}>
-                            {message.answeredMessage.image && ( 
+                            {message.answeredMessage.image && (
                                 <Image src={message.answeredMessage.image} alt="Answer image" width={280} height={280}
-                                       className="rounded-md object-cover w-10 h-10" />
+                                       className="rounded-md object-cover w-10 h-10"/>
                             )}
                             <div>
                                 <span className="font-bold text-xs text-sky-700">
                                     {message.answeredMessage.sender?.name}
                                 </span>
-                                    <p className="text-primary text-sm">{message.answeredMessage.body}</p>
+                                <p className="text-primary text-sm">{message.answeredMessage.body}</p>
                             </div>
                         </div>
                     )}
