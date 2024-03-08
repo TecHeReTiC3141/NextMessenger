@@ -3,10 +3,11 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/config/authOptions";
 import prisma from "@/app/lib/db/prisma";
-import { Prisma } from "@prisma/client";
+import { Conversation, Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { CreateGroupChatSchema } from "@/app/lib/schema";
 import { getPusherInstance } from "@/app/lib/pusher";
+import { FullMessage } from "@/app/lib/db/message";
 
 
 export type ConversationWithUsers = Prisma.ConversationGetPayload<{
@@ -100,35 +101,9 @@ export async function createGroupChat(data: FormData): Promise<ConversationWithU
     return newConversation;
 }
 
-export type ConversationWithMessages = Prisma.ConversationGetPayload<{
-    include: {
-        messages: {
-            include: {
-                seen: {
-                    select: {
-                        id: true,
-                        name: true,
-                    }
-                },
-                sender: {
-                    select: {
-                        id: true,
-                        name: true,
-                        image: true,
-                    }
-                },
-                answeredMessage: {
-                    select: {
-                        id: true,
-                        body: true,
-                        image: true,
-                        sender: true,
-                    }
-                }
-            }
-        }
-    }
-}>;
+export type ConversationWithMessages = Conversation & {
+    messages: FullMessage[],
+}
 
 export type ConversationInList = ConversationWithMessages & ConversationWithUsers;
 

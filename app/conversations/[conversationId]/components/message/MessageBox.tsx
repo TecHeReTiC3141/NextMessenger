@@ -72,6 +72,10 @@ export default function MessageBox({
         console.log(answer, `#message-${message.answeredMessage?.id}`);
         if (answer) {
             answer.scrollIntoView(true);
+            answer.classList.add("bg-sky-200");
+            setTimeout(() => {
+                answer.classList.remove("bg-sky-200");
+            }, 1000);
         }
     }
 
@@ -80,7 +84,7 @@ export default function MessageBox({
     return (
         <>
             <ConfirmMessageDeleteModal message={message}/>
-            <div className={clsx("chat", isOwnMessage ? "chat-end" : "chat-start")} id={`message-${message.id}`}>
+            <div className={clsx("chat transition duration-300 bg-opacity-80 ease-linear bg-white", isOwnMessage ? "chat-end" : "chat-start")} id={`message-${message.id}`}>
                 <div className="chat-image avatar">
                     <div className="h-10 w-12 rounded-full">
                         <UserAvatar user={message.sender as User} height={40} width={40}/>
