@@ -61,6 +61,13 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
         }
     }, [ editedMessage, setValue ]);
 
+    // useEffect(() => {
+    //     document.addEventListener("click", () => {
+    //         const gifSection = document.querySelector("#gif-section") as HTMLDivElement;
+    //         console.log("in effeft", gifSection);
+    //         gifSection.classList.remove("open");
+    //     })
+    // }, []);
 
     const watchImage = watch("image");
     const watchMessage = watch("message");
@@ -144,15 +151,19 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
                            id="message-form-body"
                            placeholder="Write a message..." {...register("message")}
                            autoFocus={editedMessage !== null}/>
-                    <div className="group absolute top-0 right-1 w-6 h-full">
+                    <div className="group absolute top-0 right-1 w-6 h-full" id="gif-section">
                         <div className="hidden group-[.open]:block absolute w-48 lg:w-96 h-80 bottom-[153%] rounded-t-lg
-                        right-0 lg:-right-10 bg-base-300 overflow-y-auto z-10">
+                        right-0 lg:-right-10 bg-base-300 overflow-y-auto z-10"
+                             onClick={event => event.stopPropagation()}>
                             <GifsSection />
                         </div>
                         <MdOutlineGifBox
                             className="absolute top-0 right-1 cursor-pointer text-gray-500 hover:text-gray-700"
                             size={32} onClick={event => {
+                                event.stopPropagation();
+
                                 const parent = event.currentTarget.parentElement as HTMLDivElement;
+                                console.log("click", parent);
                                 parent.classList.toggle("open");
                         }}/>
                     </div>
