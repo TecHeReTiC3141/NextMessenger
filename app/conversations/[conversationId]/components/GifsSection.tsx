@@ -84,7 +84,6 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
                         </div>
                         <div className="w-full flex flex-col lg:flex-row gap-x-2 items-start h-60 overflow-y-auto">
                             <div className="flex flex-col justify-start w-full lg:w-1/2 gap-1">
-
                                 {gifs.slice(0, gifs.length / 2).map(url => (
                                     <div key={url} className="w-full">
                                         <Image src={url} alt="Gif" width={180} height={180}
