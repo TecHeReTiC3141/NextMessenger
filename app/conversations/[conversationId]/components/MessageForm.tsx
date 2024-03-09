@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { AddMessageFormSchema } from "@/app/lib/schema";
 import { z } from "zod";
-import { MdOutlineGifBox, MdPhoto } from "react-icons/md";
+import { MdPhoto } from "react-icons/md";
 import { HiPaperAirplane } from "react-icons/hi2";
 import { handleMessageFormSubmit } from "@/app/conversations/[conversationId]/actions";
 import toast from "react-hot-toast";
@@ -151,23 +151,8 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
                            id="message-form-body"
                            placeholder="Write a message..." {...register("message")}
                            autoFocus={editedMessage !== null}/>
-                    <div className="group absolute top-0 right-1 w-6 h-full" id="gif-section">
-                        <div className="hidden group-[.open]:block absolute w-48 lg:w-96 h-80 bottom-[153%] rounded-t-lg
-                        right-0 lg:-right-10 bg-base-300 overflow-y-auto z-10"
-                             onClick={event => event.stopPropagation()}>
-                            <GifsSection />
-                        </div>
-                        <MdOutlineGifBox
-                            className="absolute top-0 right-1 cursor-pointer text-gray-500 hover:text-gray-700"
-                            size={32} onClick={event => {
-                                event.stopPropagation();
 
-                                const parent = event.currentTarget.parentElement as HTMLDivElement;
-                                console.log("click", parent);
-                                parent.classList.toggle("open");
-                        }}/>
-                    </div>
-
+                    <GifsSection answeringMessage={answeringMessage} editedMessage={editedMessage} />
                 </div>
 
                 <button disabled={watchMessage?.length == 0 && watchImage?.length == 0}
