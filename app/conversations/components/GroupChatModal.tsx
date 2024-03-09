@@ -1,5 +1,4 @@
 import Modal, { closeModal } from "@/app/components/Modal";
-import ConversationsListProps from "@/app/conversations/components/ConversationsList";
 import { User } from "@prisma/client";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +18,8 @@ interface GroupChatModalProps {
 type FormInputs = z.infer<typeof CreateGroupChatSchema>;
 
 export default function GroupChatModal({ users }: GroupChatModalProps) {
+
+    // TODO: implement editing of group chats
 
     const animatedComponents = makeAnimated();
 

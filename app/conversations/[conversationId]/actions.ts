@@ -9,6 +9,8 @@ import { authOptions } from "@/app/lib/config/authOptions";
 import { redirect } from "next/navigation";
 import { getPusherInstance } from "@/app/lib/pusher";
 import { Message } from "@prisma/client";
+import axios from "axios";
+import { TenorResponse } from "@/app/api/tenor/tenorAxios";
 
 export default async function getConversationById(conversationId: string): Promise<ConversationInList | null> {
     return prisma.conversation.findUnique({
@@ -146,4 +148,17 @@ export async function getAnsweredMessage(answeredId: string): Promise<MessageWit
             sender: true,
         }
     });
+}
+
+export async function getGifs(query: string, mode: "search" | "featured" = "featured"): Promise<string[]> {
+    const response = await axios.get<TenorResponse>("http://localhost:3000/api/tenor", {
+        params: {
+            query,
+            mode,
+        }
+    });
+    console.log("response: ", response.data);
+    return response.data.results.map(res =>
+        (res.media_formats.gif || res.media_formats.tinygif || res.media_formats.mp4).url
+    );
 }

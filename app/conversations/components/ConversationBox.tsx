@@ -15,6 +15,8 @@ interface ConversationBoxProps {
 
 export default function ConversationBox({ conversation, selected }: ConversationBoxProps) {
 
+    // TODO: add counter of unread messages
+
     const session = useSession();
 
     const userId = session?.data?.user?.id;

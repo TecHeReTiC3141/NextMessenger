@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { AddMessageFormSchema } from "@/app/lib/schema";
 import { z } from "zod";
-import { MdPhoto } from "react-icons/md";
+import { MdOutlineGifBox, MdPhoto } from "react-icons/md";
 import { HiPaperAirplane } from "react-icons/hi2";
 import { handleMessageFormSubmit } from "@/app/conversations/[conversationId]/actions";
 import toast from "react-hot-toast";
@@ -18,6 +18,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FiEdit3 } from "react-icons/fi";
 import { MessageWithSender } from "@/app/lib/db/message";
 import { IoArrowUndoOutline } from "react-icons/io5";
+import GifsSection from "@/app/conversations/[conversationId]/components/GifsSection";
 
 
 type formFields = z.infer<typeof AddMessageFormSchema>;
@@ -111,7 +112,8 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
                     className="absolute w-full bottom-full left-0 px-2 py-1 bg-base-300 flex items-center z-10 gap-3">
                     <IoArrowUndoOutline className="text-sky-500" size={24}/>
                     <div className="flex-1">
-                        <p className="text-sm text-sky-500">Answering <span className="font-bold">{answeringMessage.sender?.name || ""}</span></p>
+                        <p className="text-sm text-sky-500">Answering <span
+                            className="font-bold">{answeringMessage.sender?.name || ""}</span></p>
                         {answeringMessage.body}
                     </div>
                     <button className="btn btn-sm btn-circle btn-ghost" onClick={handleCloseEdit}>✕</button>
@@ -135,8 +137,28 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
                 </CldUploadButton>
                 <input type="hidden" value={conversationId} {...register("conversationId")}/>
                 <input type="text" className="hidden" {...register("image")}/>
-                <input type="text" className="flex-1 input input-sm focus:outline-none rounded-full bg-base-200" id="message-form-body"
-                       placeholder="Write a message..." {...register("message")} autoFocus={editedMessage !== null} />
+                <div className="flex-1 relative">
+
+                    <input type="text"
+                           className="w-full input input-sm focus:outline-none rounded-full bg-base-200 relative"
+                           id="message-form-body"
+                           placeholder="Write a message..." {...register("message")}
+                           autoFocus={editedMessage !== null}/>
+                    <div className="group absolute top-0 right-1 w-6 h-full">
+                        <div className="hidden group-[.open]:block absolute w-48 lg:w-96 h-80 bottom-[153%] rounded-t-lg
+                        right-0 lg:-right-10 bg-base-300 overflow-y-auto z-10">
+                            <GifsSection />
+                        </div>
+                        <MdOutlineGifBox
+                            className="absolute top-0 right-1 cursor-pointer text-gray-500 hover:text-gray-700"
+                            size={32} onClick={event => {
+                                const parent = event.currentTarget.parentElement as HTMLDivElement;
+                                parent.classList.toggle("open");
+                        }}/>
+                    </div>
+
+                </div>
+
                 <button disabled={watchMessage?.length == 0 && watchImage?.length == 0}
                         className="btn btn-circle btn-sm hover:shadow-md btn-primary">
                     <HiPaperAirplane/>

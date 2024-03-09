@@ -81,7 +81,6 @@ export default function MessageBox({
         }
     }
 
-    console.log(message.body, message.answeredMessage);
 
     return (
         <>
