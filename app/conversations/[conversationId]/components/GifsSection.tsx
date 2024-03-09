@@ -20,14 +20,13 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
     const { conversationId } = useConversation();
 
     const [ gifs, setGifs ] = useState<string[]>([]);
-    const [ timer, setTimer ] = useState<number>(0);
+    const [ timeoutId, setTimeoutId ] = useState<NodeJS.Timeout>();
     const [ isOpened, setIsOpened ] = useState<boolean>(false);
 
     useEffect(() => {
         getGifs("", "featured")
             .then(res => setGifs(res))
             .catch(err => toast.error("Error while searching for gifs:", err));
-        setInterval(() => setTimer(prev => prev + 1), 1);
     }, []);
 
     function debounce(func: Function, delay: number) {
@@ -38,17 +37,21 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
         };
     }
 
-    const handleSearch = useCallback(debounce(async (query: string) => {
-        try {
+    const handleSearch = useCallback(async (query: string) => {
+        clearTimeout(timeoutId);
+        setTimeoutId(setTimeout(async () => {
 
-            const result = await getGifs(query, query !== "" ? "search" : "featured");
-            console.log(result);
-            setGifs(result);
-        } catch (err: any) {
-            toast.error("Error while searching for gifs:", err);
-        }
+            try {
 
-    }, 350), []);
+                const result = await getGifs(query, query !== "" ? "search" : "featured");
+                console.log(result);
+                setGifs(result);
+            } catch (err: any) {
+                toast.error("Error while searching for gifs:", err);
+            }
+        }, 350));
+
+    }, [timeoutId]);
 
     async function handleUploadGif(gifUrl: string) {
         try {
@@ -73,9 +76,9 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
                         <div className="relative my-2">
                             <input type="text"
                                    className="input input-sm w-full focus:outline-none focus:border-gray-700"
-                                   placeholder="Search in Tenor" onChange={ev => {
+                                   placeholder="Search in Tenor" onChange={async ev => {
                                 const query = ev.currentTarget.value;
-                                handleSearch(query);
+                                await handleSearch(query);
                             }}/>
                             <FaMagnifyingGlass className="absolute top-1/2 -translate-y-1/2 right-1" size={20}/>
                         </div>
