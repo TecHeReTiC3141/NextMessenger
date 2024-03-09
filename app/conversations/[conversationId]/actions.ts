@@ -9,8 +9,7 @@ import { authOptions } from "@/app/lib/config/authOptions";
 import { redirect } from "next/navigation";
 import { getPusherInstance } from "@/app/lib/pusher";
 import { Message } from "@prisma/client";
-import axios from "axios";
-import { TenorResponse } from "@/app/api/tenor/tenorAxios";
+import tenorAxios, { TenorResponse } from "@/app/api/tenor/tenorAxios";
 
 export default async function getConversationById(conversationId: string): Promise<ConversationInList | null> {
     return prisma.conversation.findUnique({
@@ -151,14 +150,37 @@ export async function getAnsweredMessage(answeredId: string): Promise<MessageWit
 }
 
 export async function getGifs(query: string, mode: "search" | "featured" = "featured"): Promise<string[]> {
-    const response = await axios.get<TenorResponse>("http://localhost:3000/api/tenor", {
-        params: {
-            query,
-            mode,
+    let response: TenorResponse;
+    if (mode === "featured") {
+        response = (await tenorAxios.get<TenorResponse>("/featured", {
+            params: {
+                key: process.env.TENOR_API_KEY,
+                client_key: "Next Messenger",
+                country: "RU",
+                locals: "ru_RU",
+                limit: 16,
+                media_filter: "gif,tinygif,mp4,tinymp4"
+            }
+        })).data;
+    } else {
+        if (!query) {
+            throw new Error("No query provided");
         }
-    });
-    console.log("response: ", response.data);
-    return response.data.results.map(res =>
+        response = (await tenorAxios.get<TenorResponse>("/search", {
+            params: {
+                key: process.env.TENOR_API_KEY,
+                client_key: "Next Messenger",
+                q: query,
+                country: "RU",
+                locals: "ru_RU",
+                limit: 16,
+                media_filter: "gif,tinygif,mp4,tinymp4"
+            }
+        })).data;
+
+    }
+
+    return response.results.map(res =>
         (res.media_formats.gif || res.media_formats.tinygif || res.media_formats.mp4).url
     );
 }

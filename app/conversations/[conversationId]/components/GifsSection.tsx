@@ -47,7 +47,7 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
                 console.log(result);
                 setGifs(result);
             } catch (err: any) {
-                toast.error("Error while searching for gifs:", err);
+                toast.error("Error while searching for gifs: " + err);
             }
         }, 350));
 
