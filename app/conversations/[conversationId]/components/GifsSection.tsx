@@ -69,7 +69,7 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
         <div className="absolute top-0 right-1 w-6 h-full" id="gif-section">
             {isOpened &&
                 <div className="absolute w-48 lg:w-96 h-80 bottom-[153%] rounded-t-lg
-                        right-0 lg:-right-10 bg-base-300 overflow-y-auto z-10"
+                        right-0 lg:-right-10 bg-base-300 overflow-y-hidden z-10"
                      onClick={event => event.stopPropagation()}>
                     <div className="w-full px-2 py-1" onClick={event => event.stopPropagation()}>
                         <h3 className="font-bold text-lg">Gifs</h3>
@@ -82,7 +82,7 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
                             }}/>
                             <FaMagnifyingGlass className="absolute top-1/2 -translate-y-1/2 right-1" size={20}/>
                         </div>
-                        <div className="w-full flex flex-col lg:flex-row gap-x-2 items-start">
+                        <div className="w-full flex flex-col lg:flex-row gap-x-2 items-start h-60 overflow-y-auto">
                             <div className="flex flex-col justify-start w-full lg:w-1/2 gap-1">
 
                                 {gifs.slice(0, gifs.length / 2).map(url => (
