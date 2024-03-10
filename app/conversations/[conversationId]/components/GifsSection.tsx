@@ -12,10 +12,11 @@ import { MdOutlineGifBox } from "react-icons/md";
 
 interface GifsSectionProps {
     answeringMessage: MessageWithSender | null,
-    editedMessage: Message | null
+    editedMessage: Message | null,
+    setImage: (url: string) => void
 }
 
-export default function GifsSection({ answeringMessage, editedMessage }: GifsSectionProps) {
+export default function GifsSection({ answeringMessage, editedMessage, setImage }: GifsSectionProps) {
 
     const { conversationId } = useConversation();
 
@@ -27,6 +28,12 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
         getGifs("", "featured")
             .then(res => setGifs(res))
             .catch(err => toast.error("Error while searching for gifs:", err));
+    }, []);
+
+    useEffect(() => {
+        document.addEventListener("click", () => {
+            setIsOpened(false);
+        })
     }, []);
 
     function debounce(func: Function, delay: number) {
@@ -51,7 +58,7 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
             }
         }, 350));
 
-    }, [timeoutId]);
+    }, [ timeoutId ]);
 
     async function handleUploadGif(gifUrl: string) {
         try {
@@ -70,8 +77,14 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
             {isOpened &&
                 <div className="absolute w-48 lg:w-96 h-80 bottom-[153%] rounded-t-lg
                         right-0 lg:-right-10 bg-base-300 overflow-y-hidden z-10"
-                     onClick={event => event.stopPropagation()}>
-                    <div className="w-full px-2 py-1" onClick={event => event.stopPropagation()}>
+                     onClick={event => {
+                         event.stopPropagation();
+                         event.nativeEvent.stopImmediatePropagation();
+                     }}>
+                    <div className="w-full px-2 py-1" onClick={event => {
+                        event.stopPropagation();
+                        event.nativeEvent.stopImmediatePropagation();
+                    }}>
                         <h3 className="font-bold text-lg">Gifs</h3>
                         <div className="relative my-2">
                             <input type="text"
@@ -88,8 +101,9 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
                                     <div key={url} className="w-full">
                                         <Image src={url} alt="Gif" width={180} height={180}
                                                className="object-cover rounded-md cursor-pointer border-2 hover:border-sky-400"
-                                               onClick={async () => {
-                                                   await handleUploadGif(url);
+                                               onClick={() => {
+                                                    setImage(url);
+                                                    setIsOpened(false)
                                                }}/>
                                     </div>
                                 ))}
@@ -99,8 +113,9 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
                                     <div key={url} className="w-full">
                                         <Image src={url} alt="Gif" width={180} height={180}
                                                className="object-cover rounded-md cursor-pointer border-2 hover:border-sky-400"
-                                               onClick={async () => {
-                                                   await handleUploadGif(url);
+                                               onClick={() => {
+                                                    setImage(url);
+                                                    setIsOpened(false)
                                                }}/>
                                     </div>
                                 ))}
@@ -111,7 +126,11 @@ export default function GifsSection({ answeringMessage, editedMessage }: GifsSec
             }
             <MdOutlineGifBox
                 className="absolute top-0 right-1 cursor-pointer text-gray-500 hover:text-gray-700"
-                size={32} onClick={() => setIsOpened(prev => !prev)}/>
+                size={32} onClick={event => {
+                    event.stopPropagation();
+                    event.nativeEvent.stopImmediatePropagation();
+                setIsOpened(prev => !prev)
+            }}/>
         </div>
 
     )

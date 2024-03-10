@@ -61,13 +61,7 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
         }
     }, [ editedMessage, setValue ]);
 
-    // useEffect(() => {
-    //     document.addEventListener("click", () => {
-    //         const gifSection = document.querySelector("#gif-section") as HTMLDivElement;
-    //         console.log("in effeft", gifSection);
-    //         gifSection.classList.remove("open");
-    //     })
-    // }, []);
+
 
     const watchImage = watch("image");
     const watchMessage = watch("message");
@@ -152,7 +146,7 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
                            placeholder="Write a message..." {...register("message")}
                            autoFocus={editedMessage !== null}/>
 
-                    <GifsSection answeringMessage={answeringMessage} editedMessage={editedMessage} />
+                    <GifsSection answeringMessage={answeringMessage} editedMessage={editedMessage} setImage={url => setValue("image", url)} />
                 </div>
 
                 <button disabled={watchMessage?.length == 0 && watchImage?.length == 0}

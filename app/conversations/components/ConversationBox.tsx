@@ -40,22 +40,22 @@ export default function ConversationBox({ conversation, selected }: Conversation
         <>
             <Link href={`/conversations/${conversation.id}`}
                   className={
-                      clsx("flex relative w-full items-center gap-3 px-3 cursor-pointer border-b border-neutral last:border-b-0 hover:bg-base-300",
+                      clsx("flex relative w-full items-center gap-3 px-3 cursor-pointer border-b border-neutral last:border-b-0 truncate hover:bg-base-300",
                           selected && "bg-base-300")}>
                 {conversation.isGroup ?
                     <>
                         <AvatarGroup users={conversation.users}/>
-                        <div className="flex-1">
+                        <div className="flex-1  max-w-4/5 w-4/5">
                             <h4 className="text-lg font-semibold text-base-content">{conversation.name}</h4>
-                            <p className={clsx("truncate text-sm",
+                            <p className={clsx("truncate text-sm max-w-full",
                                 seenLastMessage ? "text-gray-500" : "text-black font-medium")}>{lastMessageText}</p>
                         </div>
                     </> :
                     <>
                         <UserAvatar user={otherUser} width={40} height={40}/>
-                        <div className="flex-1">
+                        <div className="flex-1 max-w-4/5 w-4/5">
                             <h4 className="text-lg font-semibold text-base-content">{otherUser.name}</h4>
-                            <p className={clsx("truncate text-sm",
+                            <p className={clsx("truncate text-sm max-w-full",
                                 seenLastMessage ? "text-gray-500" : "text-black font-medium")}>{lastMessageText}</p>
                         </div>
                     </>
