@@ -80,7 +80,6 @@ export default function MessageBox({
         }
     }
 
-
     return (
         <>
             <ConfirmMessageDeleteModal message={message}/>
