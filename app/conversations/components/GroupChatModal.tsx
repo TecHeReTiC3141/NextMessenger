@@ -25,7 +25,7 @@ export default function GroupChatModal({ users }: GroupChatModalProps) {
 
     const {
         register,
-        setValue,
+        setValue,//
         reset,
         watch,
         handleSubmit,

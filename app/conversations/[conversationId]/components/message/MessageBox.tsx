@@ -29,7 +29,6 @@ export default function MessageBox({
                                        setMessageWithActionMenu,
                                    }: MessageBoxProps) {
 
-    // TODO: Implement answering to certain message
 
     const [ isContextMenuVisible, setContextMenuVisible ] = useState(false);
     const [ contextMenuPosition, setContextMenuPosition ] = useState({ x: 0, y: 0 });

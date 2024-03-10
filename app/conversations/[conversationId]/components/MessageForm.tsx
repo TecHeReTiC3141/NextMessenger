@@ -32,7 +32,6 @@ export default function MessageForm({ editedMessage, answeringMessage }: AddNewM
 
     const { conversationId } = useConversation();
 
-    // TODO: add Tenor client for gifs
 
     const pathname = usePathname(), searchParams = useSearchParams();
 
