@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { CreateGroupChatSchema } from "@/app/lib/schema";
 import { getPusherInstance } from "@/app/lib/pusher";
 import { FullMessage } from "@/app/lib/db/message";
+import { revalidatePath } from "next/cache";
 
 
 export type ConversationWithUsers = Prisma.ConversationGetPayload<{
@@ -47,34 +48,57 @@ export async function createChat({ userId }: ChatCreateData): Promise<Conversati
                     { id: currentUser.id },
                     { id: userId },
                 ]
+            },
+
+            unreadMessages: {
+                createMany: {
+                    data: [
+                        {
+                            userId: currentUser.id,
+                        },
+                        { userId },
+                    ]
+                }
             }
         },
         include: {
             users: true,
+            messages: {
+                include: {
+                    seen: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    },
+                    sender: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            email: true,
+                        }
+                    },
+                    answeredMessage: {
+                        select: {
+                            id: true,
+                            body: true,
+                            image: true,
+                            sender: true,
+                        }
+                    }
+                }
+            },
             unreadMessages: {
                 where: {
-                    userId: {
-                        in: [currentUser.id, userId],
-                    }
+                    userId: session.user.id,
                 },
                 select: {
+                    userId: true,
                     value: true,
-                }
+                },
             }
         }
-    });
-
-    await prisma.unreadMessages.createMany({
-        data: [
-            {
-                userId: currentUser.id,
-                conversationId: newConversation.id,
-            },
-            {
-                userId,
-                conversationId: newConversation.id,
-            },
-        ]
     });
 
     newConversation.users.forEach(user => {
@@ -108,24 +132,58 @@ export async function createGroupChat(data: FormData): Promise<ConversationWithU
                         { id: member.value }
                     ))),
                 ]
+            },
+            unreadMessages: {
+                createMany: {
+                    data: [
+                        {
+                            userId: currentUser.id,
+                        },
+                        ...(members.map(member => ({
+                            userId: member.value,
+                        }))),
+                    ]
+                }
             }
         },
         include: {
             users: true,
-        }
-    });
-
-    await prisma.unreadMessages.createMany({
-        data: [
-            {
-                userId: currentUser.id,
-                conversationId: newConversation.id,
+            messages: {
+                include: {
+                    seen: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    },
+                    sender: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            email: true,
+                        }
+                    },
+                    answeredMessage: {
+                        select: {
+                            id: true,
+                            body: true,
+                            image: true,
+                            sender: true,
+                        }
+                    }
+                }
             },
-            ...(members.map(member => ({
-                userId: member.value,
-                conversationId: newConversation.id,
-            }))),
-        ]
+            unreadMessages: {
+                where: {
+                    userId: session.user.id,
+                },
+                select: {
+                    userId: true,
+                    value: true,
+                },
+            }
+        }
     });
 
     newConversation.users.forEach(user => {
@@ -133,8 +191,8 @@ export async function createGroupChat(data: FormData): Promise<ConversationWithU
             getPusherInstance().trigger(user.email, "conversation:new", newConversation);
         }
     });
-
-    return redirect(`/conversation/${newConversation.id}`);
+    revalidatePath("/conversations/[conversationId]", "page")
+    return redirect(`/conversations/${newConversation.id}`);
 }
 
 export type ConversationWithMessages = Conversation & {

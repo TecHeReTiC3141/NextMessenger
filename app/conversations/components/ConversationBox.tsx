@@ -25,9 +25,7 @@ export default function ConversationBox({ conversation, selected }: Conversation
 
     const lastMessage = (conversation.messages || []).at(-1);
 
-    if (conversation.unreadMessages.length > 0) {
-        console.log(conversation.name, conversation.unreadMessages);
-    }
+    console.log(conversation);
 
     const seenLastMessage = useMemo(() => {
         if (!userId || !lastMessage) {
@@ -72,9 +70,10 @@ export default function ConversationBox({ conversation, selected }: Conversation
                     {lastMessage && format(new Date(lastMessage.createdAt), "p")}
                 </p>
 
-                <div className="absolute bottom-0.5 right-2 text-sm w-5 h-5 bg-primary text-primary-content text-center rounded-full">
+                {unreadMessagesCount > 0 && <div
+                    className="absolute bottom-0.5 right-2 text-sm w-5 h-5 bg-sky-400 text-primary-content text-center rounded-full">
                     {unreadMessagesCount}
-                </div>
+                </div>}
 
             </Link>
         </>

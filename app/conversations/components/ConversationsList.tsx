@@ -118,8 +118,8 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
         <>
             <aside
                 className={clsx(isOpen && "max-lg:hidden",
-                    "fixed inset-y-0 w-full pb-20 lg:w-80 lg:pb-0 lg:left-20 border-r border-base-300 left-0")}>
-                <div>
+                    "fixed inset-y-0 w-full pb-20 lg:w-80 lg:pb-0 lg:left-20 border-r border-base-300 left-0 h-full")}>
+                <div className="h-full">
                     <div className="flex justify-between py-4 px-3">
                         <div className="text-2xl font-bold">
                             Chats
@@ -129,10 +129,13 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
                             <MdGroupAdd size={20}/>
                         </button>
                     </div>
-                    {items.map(conversation => (
-                        <ConversationBox key={conversation.id} conversation={conversation}
-                                         selected={conversation.id === conversationId}/>
-                    ))}
+                    <div className="w-full  overflow-y-auto max-h-full">
+
+                        {items.map(conversation => (
+                            <ConversationBox key={conversation.id} conversation={conversation}
+                                             selected={conversation.id === conversationId}/>
+                        ))}
+                    </div>
                 </div>
             </aside>
             <GroupChatModal users={otherUsers}/>

@@ -52,9 +52,6 @@ export async function createNewMessage({
                 sender: {
                     connect: { id: session.user.id },
                 },
-                seen: {
-                    connect: { id: session.user.id },
-                },
                 answeredMessage: {
                     connect: {
                         id: answeringId,
@@ -98,9 +95,6 @@ export async function createNewMessage({
                 sender: {
                     connect: { id: session.user.id },
                 },
-                seen: {
-                    connect: { id: session.user.id },
-                }
             },
             include: {
                 seen: {

@@ -114,21 +114,53 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
             }
         },
         include: {
-            seen: true,
-            sender: true,
+            seen: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            },
+            sender: {
+                select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                    email: true,
+                }
+            },
+            answeredMessage: {
+                select: {
+                    id: true,
+                    body: true,
+                    image: true,
+                    sender: true,
+                }
+            }
         }
     });
-
+    console.log("before unread messages updated", {
+        userId: currentUser.id,
+        conversationId,
+    });
+    await prisma.unreadMessages.updateMany({
+        where: {
+            userId: currentUser.id,
+            conversationId,
+        },
+        data: {
+            value: 0,
+        }
+    })
     await getPusherInstance().trigger(currentUser.email as string, "conversation:update", {
         id: conversationId,
         messages: [ updatedMessage ],
         lastMessageAt: curConversation.lastMessageAt,
-
+        unreadMessages: [ { userId: currentUser.id, value: 0 } ],
     });
 
     console.log("updated message", updatedMessage);
     await getPusherInstance().trigger(conversationId, "message:update", updatedMessage);
-    return updatedMessage
+    return updatedMessage;
 }
 
 export async function getEditedMessage(editedId: string): Promise<Message | null> {
