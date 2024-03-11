@@ -1,6 +1,6 @@
 "use client"
 
-import { ConversationInList } from "@/app/lib/db/conversation";
+import { ConversationInList, FullConversation } from "@/app/lib/db/conversation";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import useConversation from "@/app/hooks/useConversation";
@@ -52,7 +52,11 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
         function updateConversationHandler(updatedConversation: {
             id: string,
             lastMessageAt: Date,
-            messages: FullMessage[]
+            messages: FullMessage[],
+            unreadMessages: {
+                userId: string,
+                value: number,
+            }[]
         }) {
             console.log(`in updated conversation`, updatedConversation);
             setItems(prev => {
@@ -67,12 +71,13 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
                         ...conversation,
                         messages: [ ...conversation.messages, ...updatedConversation.messages ],
                         lastMessageAt: updatedConversation.lastMessageAt,
+                        unreadMessages: updatedConversation.unreadMessages || conversation.unreadMessages
                     }
                 }).sort((c1, c2) => new Date(c2.lastMessageAt).getTime() - new Date(c1.lastMessageAt).getTime());
             })
         }
 
-        function removeConversationHandler(deletedConversation: ConversationInList) {
+        function removeConversationHandler(deletedConversation: FullConversation) {
             setItems(prev =>
                 prev.filter(conversation => conversation.id !== deletedConversation.id));
             if (conversationId === deletedConversation.id) {

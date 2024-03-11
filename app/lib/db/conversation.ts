@@ -51,7 +51,30 @@ export async function createChat({ userId }: ChatCreateData): Promise<Conversati
         },
         include: {
             users: true,
+            unreadMessages: {
+                where: {
+                    userId: {
+                        in: [currentUser.id, userId],
+                    }
+                },
+                select: {
+                    value: true,
+                }
+            }
         }
+    });
+
+    await prisma.unreadMessages.createMany({
+        data: [
+            {
+                userId: currentUser.id,
+                conversationId: newConversation.id,
+            },
+            {
+                userId,
+                conversationId: newConversation.id,
+            },
+        ]
     });
 
     newConversation.users.forEach(user => {
@@ -92,20 +115,41 @@ export async function createGroupChat(data: FormData): Promise<ConversationWithU
         }
     });
 
+    await prisma.unreadMessages.createMany({
+        data: [
+            {
+                userId: currentUser.id,
+                conversationId: newConversation.id,
+            },
+            ...(members.map(member => ({
+                userId: member.value,
+                conversationId: newConversation.id,
+            }))),
+        ]
+    });
+
     newConversation.users.forEach(user => {
         if (user.email) {
             getPusherInstance().trigger(user.email, "conversation:new", newConversation);
         }
     });
 
-    return newConversation;
+    return redirect(`/conversation/${newConversation.id}`);
 }
 
 export type ConversationWithMessages = Conversation & {
     messages: FullMessage[],
 }
 
-export type ConversationInList = ConversationWithMessages & ConversationWithUsers;
+export type FullConversation = ConversationWithMessages & ConversationWithUsers;
+
+export type ConversationInList = FullConversation & {
+    unreadMessages: {
+        userId: string,
+        value: number,
+    }[],
+};
+
 
 export async function getUserConversations(): Promise<ConversationInList[]> {
     const session = await getServerSession(authOptions);
@@ -147,6 +191,15 @@ export async function getUserConversations(): Promise<ConversationInList[]> {
                         }
                     }
                 }
+            },
+            unreadMessages: {
+                where: {
+                    userId: session.user.id,
+                },
+                select: {
+                    userId: true,
+                    value: true,
+                },
             }
         }
     });

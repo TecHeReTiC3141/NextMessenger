@@ -1,4 +1,4 @@
-import { ConversationInList } from "@/app/lib/db/conversation";
+import { FullConversation } from "@/app/lib/db/conversation";
 import useOtherUser from "@/app/hooks/useOtherUser";
 import { format } from "date-fns";
 import { IoClose } from "react-icons/io5";
@@ -7,7 +7,7 @@ import AvatarGroup from "@/app/components/AvatarGroup";
 import useActiveList from "@/app/hooks/useActiveList";
 
 interface ProfileModalProps {
-    conversation: ConversationInList
+    conversation: FullConversation
 }
 
 export default function ProfileDrawer({ conversation }: ProfileModalProps) {

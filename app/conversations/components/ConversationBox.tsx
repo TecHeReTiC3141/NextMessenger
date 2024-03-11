@@ -25,6 +25,10 @@ export default function ConversationBox({ conversation, selected }: Conversation
 
     const lastMessage = (conversation.messages || []).at(-1);
 
+    if (conversation.unreadMessages.length > 0) {
+        console.log(conversation.name, conversation.unreadMessages);
+    }
+
     const seenLastMessage = useMemo(() => {
         if (!userId || !lastMessage) {
             return false;
@@ -33,6 +37,10 @@ export default function ConversationBox({ conversation, selected }: Conversation
         const seen = lastMessage.seen || [];
         return seen.filter(user => user.id === userId).length > 0;
     }, [ lastMessage, userId ]);
+    
+    const unreadMessagesCount = useMemo(() => {
+        return conversation.unreadMessages[0]?.value || 0;
+    }, [conversation.unreadMessages])
 
     const lastMessageText = lastMessage ? (lastMessage?.image ? "Sent an image" : lastMessage?.body) : "Start a new chat";
 
@@ -63,6 +71,11 @@ export default function ConversationBox({ conversation, selected }: Conversation
                 <p className="absolute top-2 right-2 text-sm">
                     {lastMessage && format(new Date(lastMessage.createdAt), "p")}
                 </p>
+
+                <div className="absolute bottom-0.5 right-2 text-sm w-5 h-5 bg-primary text-primary-content text-center rounded-full">
+                    {unreadMessagesCount}
+                </div>
+
             </Link>
         </>
     );

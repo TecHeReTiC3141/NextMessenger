@@ -1,6 +1,6 @@
 "use client"
 
-import { ConversationInList } from "@/app/lib/db/conversation";
+import { FullConversation } from "@/app/lib/db/conversation";
 import useOtherUser from "@/app/hooks/useOtherUser";
 import Link from "next/link";
 import { FaArrowLeft, FaEllipsisVertical, FaRegTrashCan } from "react-icons/fa6";
@@ -14,7 +14,7 @@ import { openModal } from "@/app/components/Modal";
 
 
 interface ConversationHeaderProps {
-    conversation: ConversationInList,
+    conversation: FullConversation,
 }
 
 export default function ConversationHeader({ conversation }: ConversationHeaderProps) {

@@ -1,8 +1,8 @@
-import { ConversationInList } from "@/app/lib/db/conversation";
+import { FullConversation } from "@/app/lib/db/conversation";
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
 
-export default function useOtherUser(conversation: ConversationInList) {
+export default function useOtherUser(conversation: FullConversation) {
 
     const session = useSession();
     const otherUsers = useMemo(() => {

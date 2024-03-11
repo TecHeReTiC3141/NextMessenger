@@ -103,4 +103,6 @@ model UnreadMessages {
     conversationId String       @db.ObjectId
     conversation   Conversation @relation(references: [id], fields: [conversationId], onDelete: Cascade)
     value          Int          @default(0)
+
+    @@map("unread-messages")
 }

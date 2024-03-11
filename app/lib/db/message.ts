@@ -14,7 +14,7 @@ type CreateMessageData = {
     answeringId?: string,
 }
 
-export type MessageSender = {id: string, name: string | null, image: string | null, email: string | null}  | null
+export type MessageSender = { id: string, name: string | null, image: string | null, email: string | null } | null
 export type MessageWithSeen = Message & { seen: { id: string, name: string | null }[] };
 export type MessageWithSender = Message & { sender: MessageSender };
 export type MessageWithAnsweringMessage = Message & {
@@ -121,6 +121,17 @@ export async function createNewMessage({
         });
     }
 
+    await prisma.unreadMessages.updateMany({
+        where: {
+            conversationId,
+        },
+        data: {
+            value: {
+                increment: 1
+            }
+        }
+    });
+
     const updatedConversation = await prisma.conversation.update({
         where: {
             id: conversationId,
@@ -134,10 +145,15 @@ export async function createNewMessage({
                 include: {
                     seen: true,
                 }
+            },
+            unreadMessages: {
+                select: {
+                    value: true,
+                    userId: true,
+                }
             }
         }
     });
-    console.log(newMessage);
 
     await getPusherInstance().trigger(conversationId, "message:new", newMessage);
 
@@ -145,7 +161,9 @@ export async function createNewMessage({
 
     updatedConversation.users.map(async user => {
         await getPusherInstance().trigger(user.email as string, "conversation:update",
-            { id: conversationId, lastMessageAt: updatedConversation.lastMessageAt, messages: [ lastMessage ] });
+            { id: conversationId, lastMessageAt: updatedConversation.lastMessageAt, messages: [ lastMessage ],
+                unreadMessages:
+                    updatedConversation.unreadMessages.filter(unread => unread.userId === session.user.id) });
     })
     revalidatePath("/conversations/[conversationId]", "page");
     return newMessage;
@@ -277,7 +295,7 @@ export async function deleteMessageById(messageId: string) {
     if (deletedMessage === null) {
         throw new Error("Couldn't find your message or it's not yours");
     }
-    deletedMessage.answers.map(async ({id}) => {
+    deletedMessage.answers.map(async ({ id }) => {
         await prisma.message.update({
             where: {
                 id,

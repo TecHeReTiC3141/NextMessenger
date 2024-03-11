@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/app/lib/db/prisma";
-import { ConversationInList } from "@/app/lib/db/conversation";
+import { FullConversation } from "@/app/lib/db/conversation";
 import { createNewMessage, FullMessage, MessageWithSender, updateMessage } from "@/app/lib/db/message";
 import { AddMessageFormSchema } from "@/app/lib/schema";
 import { getServerSession } from "next-auth";
@@ -11,7 +11,7 @@ import { getPusherInstance } from "@/app/lib/pusher";
 import { Message } from "@prisma/client";
 import tenorAxios, { TenorResponse } from "@/app/api/tenor/tenorAxios";
 
-export default async function getConversationById(conversationId: string): Promise<ConversationInList | null> {
+export default async function getConversationById(conversationId: string): Promise<FullConversation | null> {
     return prisma.conversation.findUnique({
         where: {
             id: conversationId,
@@ -123,6 +123,7 @@ export async function setSeenLastMessage(conversationId: string): Promise<FullMe
         id: conversationId,
         messages: [ updatedMessage ],
         lastMessageAt: curConversation.lastMessageAt,
+
     });
 
     console.log("updated message", updatedMessage);
