@@ -17,7 +17,7 @@ const fuseOptions: IFuseOptions<User> = {
 
 export default function UsersList({ initialItems }: UsersListProps) {
     const [ items, setItems ] = useState(initialItems);
-    const fuse = useMemo(() => new Fuse(initialItems, fuseOptions), [initialItems]);
+    const fuse = useMemo(() => new Fuse(initialItems, fuseOptions), [ initialItems ]);
 
     function handleUserSearch(ev: ChangeEvent<HTMLInputElement>) {
         const userSearchInput = ev.currentTarget as HTMLInputElement;
@@ -29,14 +29,15 @@ export default function UsersList({ initialItems }: UsersListProps) {
     return (
         <aside
             className="fixed inset-y-0 w-full block pb-20 lg:w-80 lg:pb-0 lg:left-20 border-r border-base-300 left-0">
-            <div>
+            <div className="h-full">
                 <div className="flex px-3 items-center gap-2">
                     <div className="text-2xl font-bold py-2">
                         People
                     </div>
                     <label
                         className="input input-sm flex items-center py-3 gap-3 lg:flex-1 max-w-sm border-none">
-                        <input type="text" placeholder="Search users..." className="lg:max-w-40 flex-grow border-none" onChange={handleUserSearch}/>
+                        <input type="text" placeholder="Search users..." className="lg:max-w-40 flex-grow border-none"
+                               onChange={handleUserSearch}/>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
                              className="w-4 h-4 opacity-70">
                             <path fillRule="evenodd"
@@ -45,10 +46,12 @@ export default function UsersList({ initialItems }: UsersListProps) {
                         </svg>
                     </label>
                 </div>
+                <div className="overflow-y-auto h-full w-full">
 
-                {items.map(user => (
-                    <UserBox key={user.id} user={user}/>
-                ))}
+                    {items.map(user => (
+                        <UserBox key={user.id} user={user}/>
+                    ))}
+                </div>
             </div>
         </aside>
     );
