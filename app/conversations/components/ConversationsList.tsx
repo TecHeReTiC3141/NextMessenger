@@ -129,7 +129,7 @@ export default function ConversationsList({ initialItems, otherUsers }: Conversa
                             <MdGroupAdd size={20}/>
                         </button>
                     </div>
-                    <div className="w-full  overflow-y-auto max-h-full">
+                    <div className="w-full  overflow-y-auto max-h-[92%]">
 
                         {items.map(conversation => (
                             <ConversationBox key={conversation.id} conversation={conversation}

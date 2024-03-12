@@ -38,7 +38,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
                             <FaArrowLeft size={32}/>
                         </Link>
                         {conversation.isGroup ?
-                            <AvatarGroup users={conversation.users}/> :
+                            <AvatarGroup users={conversation.users} type="full"/> :
                             <UserAvatar user={otherUser} width={36} height={36}/>
                         }
                         <label htmlFor="profile-drawer-toggle"

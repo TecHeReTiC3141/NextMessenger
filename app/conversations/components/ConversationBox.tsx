@@ -15,8 +15,6 @@ interface ConversationBoxProps {
 
 export default function ConversationBox({ conversation, selected }: ConversationBoxProps) {
 
-    // TODO: add counter of unread messages
-
     const session = useSession();
 
     const userId = session?.data?.user?.id;
@@ -50,7 +48,7 @@ export default function ConversationBox({ conversation, selected }: Conversation
                           selected && "bg-base-300")}>
                 {conversation.isGroup ?
                     <>
-                        <AvatarGroup users={conversation.users}/>
+                        <AvatarGroup users={conversation.users} type="slim"/>
                         <div className="flex-1  max-w-4/5 w-4/5">
                             <h4 className="text-lg font-semibold text-base-content">{conversation.name}</h4>
                             <p className={clsx("truncate text-sm max-w-full",

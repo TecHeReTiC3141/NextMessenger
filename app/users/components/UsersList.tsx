@@ -28,7 +28,7 @@ export default function UsersList({ initialItems }: UsersListProps) {
 
     return (
         <aside
-            className="fixed inset-y-0 w-full block pb-20 lg:w-80 lg:pb-0 lg:left-20 border-r border-base-300 left-0">
+            className="fixed inset-y-0 w-full block pb-20 lg:w-80 lg:pb-0 lg:left-20 border-r border-base-300 left-0 h-full">
             <div className="h-full">
                 <div className="flex px-3 items-center gap-2">
                     <div className="text-2xl font-bold py-2">
@@ -46,7 +46,7 @@ export default function UsersList({ initialItems }: UsersListProps) {
                         </svg>
                     </label>
                 </div>
-                <div className="overflow-y-auto h-full w-full">
+                <div className="overflow-y-auto h-[92%] w-full">
 
                     {items.map(user => (
                         <UserBox key={user.id} user={user}/>

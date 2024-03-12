@@ -1,4 +1,4 @@
-import {SessionUser} from "@/app/lib/db/user";
+import { SessionUser } from "@/app/lib/db/user";
 import Image from "next/image";
 import avatarPlaceholder from "@/public/images/avatar-placeholder.jpg";
 import useActiveList from "@/app/hooks/useActiveList";
@@ -19,9 +19,9 @@ export default function UserAvatar({user, width, height}: UserAvatarProps) {
         <div className={clsx("avatar relative cursor-pointer hover:opacity-75 transition-opacity duration-200", isActive ? "online" : "offline")}>
             <div style={{width, height}} className="rounded-full">
 
-            <Image className="rounded-full object-cover"
+            <Image className="rounded-full object-cover" style={{width, height}}
                    src={user?.image || avatarPlaceholder} alt={user?.name || ""}
-                   fill />
+                   width={280} height={280} />
             </div>
         </div>
     )

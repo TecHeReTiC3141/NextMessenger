@@ -33,7 +33,7 @@ export default function ProfileDrawer({ conversation }: ProfileModalProps) {
                 </label>
             </div>
             <div className="flex flex-col items-center gap-1 mt-14">
-                {conversation.isGroup ? <AvatarGroup users={conversation.users}/>
+                {conversation.isGroup ? <AvatarGroup users={conversation.users} type="full"/>
                     : <UserAvatar user={otherUser} width={60} height={60}/>
                 }
                 <h4 className="text-lg">{title}</h4>
